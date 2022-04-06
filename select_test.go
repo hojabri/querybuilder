@@ -122,6 +122,27 @@ func TestSelectQuery_Build(t *testing.T) {
 			wantArgs:       []interface{}{1, 2, 3, 4, 5, 6},
 			wantErr:        nil,
 		},
+		{
+			name:           "test16",
+			query:          s.Table("table1").Select("field1").Joins("table2", "table1.id=table2.t_id", JoinLeft).Where(In("id", ids, 4, 5, 6)),
+			wantBuiltQuery: "SELECT field1 FROM table1 LEFT JOIN table2 ON table1.id=table2.t_id WHERE (id IN (?,?,?,?,?,?))",
+			wantArgs:       []interface{}{1, 2, 3, 4, 5, 6},
+			wantErr:        nil,
+		},
+		{
+			name:           "test17",
+			query:          s.Table("table1").Select("field1").Joins("table2", "table1.id=table2.t_id", JoinRight).Where(In("id", ids, 4, 5, 6)),
+			wantBuiltQuery: "SELECT field1 FROM table1 RIGHT JOIN table2 ON table1.id=table2.t_id WHERE (id IN (?,?,?,?,?,?))",
+			wantArgs:       []interface{}{1, 2, 3, 4, 5, 6},
+			wantErr:        nil,
+		},
+		{
+			name:           "test18",
+			query:          s.Table("table1").Select("field1").Joins("table2", "table1.id=table2.t_id", 10).Where(In("id", ids, 4, 5, 6)),
+			wantBuiltQuery: "SELECT field1 FROM table1 JOIN table2 ON table1.id=table2.t_id WHERE (id IN (?,?,?,?,?,?))",
+			wantArgs:       []interface{}{1, 2, 3, 4, 5, 6},
+			wantErr:        nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
