@@ -3,7 +3,7 @@ package querybuilder
 import (
 	"errors"
 	"testing"
-	
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -14,7 +14,7 @@ func TestSelectQuery_Build(t *testing.T) {
 		name           string
 		query          *SelectQuery
 		wantBuiltQuery string
-		wantArgs       []interface{}
+		wantArgs       []any
 		wantErr        error
 	}{
 		{
@@ -56,28 +56,28 @@ func TestSelectQuery_Build(t *testing.T) {
 			name:           "test6",
 			query:          s.Table("table1").Select("field1").Where("id > ?", 120),
 			wantBuiltQuery: "SELECT field1 FROM table1 WHERE (id > ?)",
-			wantArgs:       []interface{}{120},
+			wantArgs:       []any{120},
 			wantErr:        nil,
 		},
 		{
 			name:           "test7",
 			query:          s.Table("table1").Select("field1").Where("id > ?", 120).Order("timestamp"),
 			wantBuiltQuery: "SELECT field1 FROM table1 WHERE (id > ?) ORDER BY timestamp",
-			wantArgs:       []interface{}{120},
+			wantArgs:       []any{120},
 			wantErr:        nil,
 		},
 		{
 			name:           "test8",
 			query:          s.Table("table1").Select("field1").Where("id > ?", 120).Order("timestamp").Group("field1,field2"),
 			wantBuiltQuery: "SELECT field1 FROM table1 WHERE (id > ?) GROUP BY field1,field2 ORDER BY timestamp",
-			wantArgs:       []interface{}{120},
+			wantArgs:       []any{120},
 			wantErr:        nil,
 		},
 		{
 			name:           "test9",
 			query:          s.Table("table1").Select("field1").Where("id > ?", 120).Order("timestamp").Group("field1,field2").Limit(1000).Offset(0),
 			wantBuiltQuery: "SELECT field1 FROM table1 WHERE (id > ?) GROUP BY field1,field2 ORDER BY timestamp LIMIT 1000 OFFSET 0",
-			wantArgs:       []interface{}{120},
+			wantArgs:       []any{120},
 			wantErr:        nil,
 		},
 		{
@@ -89,58 +89,58 @@ func TestSelectQuery_Build(t *testing.T) {
 		},
 		{
 			name:           "test11",
-			query:          s.Table("table1").Select("field1").Where(In("id", []interface{}{120, 140, 160})).Where("name=?", "Omid"),
+			query:          s.Table("table1").Select("field1").Where(In("id", []any{120, 140, 160})).Where("name=?", "Omid"),
 			wantBuiltQuery: "SELECT field1 FROM table1 WHERE (id IN (?,?,?)) AND (name=?)",
-			wantArgs:       []interface{}{120, 140, 160, "Omid"},
+			wantArgs:       []any{120, 140, 160, "Omid"},
 			wantErr:        nil,
 		},
 		{
 			name:           "test12",
 			query:          s.Table("table1").Select("field1").Where(In("id", ids)),
 			wantBuiltQuery: "SELECT field1 FROM table1 WHERE (id IN (?,?,?))",
-			wantArgs:       []interface{}{ids[0], ids[1], ids[2]},
+			wantArgs:       []any{ids[0], ids[1], ids[2]},
 			wantErr:        nil,
 		},
 		{
 			name:           "test13",
 			query:          s.Table("table1").Select("field1").Where("id > ? OR name = ?", 120, "Omid"),
 			wantBuiltQuery: "SELECT field1 FROM table1 WHERE (id > ? OR name = ?)",
-			wantArgs:       []interface{}{120, "Omid"},
+			wantArgs:       []any{120, "Omid"},
 			wantErr:        nil,
 		},
 		{
 			name:           "test14",
 			query:          s.Table("table1").Select("field1").Where("id > ? OR name = ?", 120, "Omid").Where(In("id", ids, 4, 5, 6)),
 			wantBuiltQuery: "SELECT field1 FROM table1 WHERE (id > ? OR name = ?) AND (id IN (?,?,?,?,?,?))",
-			wantArgs:       []interface{}{120, "Omid", 1, 2, 3, 4, 5, 6},
+			wantArgs:       []any{120, "Omid", 1, 2, 3, 4, 5, 6},
 			wantErr:        nil,
 		},
 		{
 			name:           "test15",
 			query:          s.Table("table1").Select("field1").Joins("table2", "table1.id=table2.t_id", JoinInner).Where(In("id", ids, 4, 5, 6)),
 			wantBuiltQuery: "SELECT field1 FROM table1 JOIN table2 ON table1.id=table2.t_id WHERE (id IN (?,?,?,?,?,?))",
-			wantArgs:       []interface{}{1, 2, 3, 4, 5, 6},
+			wantArgs:       []any{1, 2, 3, 4, 5, 6},
 			wantErr:        nil,
 		},
 		{
 			name:           "test16",
 			query:          s.Table("table1").Select("field1").Joins("table2", "table1.id=table2.t_id", JoinLeft).Where(In("id", ids, 4, 5, 6)),
 			wantBuiltQuery: "SELECT field1 FROM table1 LEFT JOIN table2 ON table1.id=table2.t_id WHERE (id IN (?,?,?,?,?,?))",
-			wantArgs:       []interface{}{1, 2, 3, 4, 5, 6},
+			wantArgs:       []any{1, 2, 3, 4, 5, 6},
 			wantErr:        nil,
 		},
 		{
 			name:           "test17",
 			query:          s.Table("table1").Select("field1").Joins("table2", "table1.id=table2.t_id", JoinRight).Where(In("id", ids, 4, 5, 6)),
 			wantBuiltQuery: "SELECT field1 FROM table1 RIGHT JOIN table2 ON table1.id=table2.t_id WHERE (id IN (?,?,?,?,?,?))",
-			wantArgs:       []interface{}{1, 2, 3, 4, 5, 6},
+			wantArgs:       []any{1, 2, 3, 4, 5, 6},
 			wantErr:        nil,
 		},
 		{
 			name:           "test18",
 			query:          s.Table("table1").Select("field1").Joins("table2", "table1.id=table2.t_id", 10).Where(In("id", ids, 4, 5, 6)),
 			wantBuiltQuery: "SELECT field1 FROM table1 JOIN table2 ON table1.id=table2.t_id WHERE (id IN (?,?,?,?,?,?))",
-			wantArgs:       []interface{}{1, 2, 3, 4, 5, 6},
+			wantArgs:       []any{1, 2, 3, 4, 5, 6},
 			wantErr:        nil,
 		},
 	}
@@ -158,28 +158,28 @@ func TestIn(t *testing.T) {
 	t.Run("test1", func(t *testing.T) {
 		query, args := In("id", 1, 2, 3)
 		require.Equal(t, "id IN (?,?,?)", query)
-		require.Equal(t, []interface{}{1, 2, 3}, args)
+		require.Equal(t, []any{1, 2, 3}, args)
 	})
-	
+
 	t.Run("test2", func(t *testing.T) {
 		ids := []int{1, 2, 3}
 		query, args := In("id", ids)
 		require.Equal(t, "id IN (?,?,?)", query)
-		require.Equal(t, []interface{}{1, 2, 3}, args)
+		require.Equal(t, []any{1, 2, 3}, args)
 	})
-	
+
 	t.Run("test3", func(t *testing.T) {
 		ids := []int{1, 2, 3}
 		query, args := In("id", ids, 4, 5, 6)
 		require.Equal(t, "id IN (?,?,?,?,?,?)", query)
-		require.Equal(t, []interface{}{1, 2, 3, 4, 5, 6}, args)
+		require.Equal(t, []any{1, 2, 3, 4, 5, 6}, args)
 	})
-	
+
 	t.Run("test4", func(t *testing.T) {
 		var ids []int
 		query, args := In("id", ids)
 		require.Equal(t, "", query)
-		require.Equal(t, []interface{}(nil), args)
+		require.Equal(t, []any(nil), args)
 	})
-	
+
 }

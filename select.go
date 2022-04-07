@@ -16,12 +16,12 @@ const (
 
 type columnClause struct {
 	query string
-	args  []interface{}
+	args  []any
 }
 
 type whereClause struct {
 	query string
-	args  []interface{}
+	args  []any
 }
 
 type JoinType int
@@ -49,7 +49,7 @@ type joinClause struct {
 	tableName string
 	on        string
 	joinType  JoinType
-	args      []interface{}
+	args      []any
 }
 
 type groupByClause struct {
@@ -67,8 +67,8 @@ type SelectQuery struct {
 	conditions []whereClause
 	groupBy    []groupByClause
 	orderBy    []orderByClause
-	limit      interface{}
-	offset     interface{}
+	limit      any
+	offset     any
 }
 
 func (s *SelectQuery) Table(name string) *SelectQuery {
@@ -77,7 +77,7 @@ func (s *SelectQuery) Table(name string) *SelectQuery {
 	return &newQuery
 }
 
-func (s *SelectQuery) Select(query string, args ...interface{}) *SelectQuery {
+func (s *SelectQuery) Select(query string, args ...any) *SelectQuery {
 	args, _ = unifyArgs(args...)
 	column := columnClause{
 		query: query,
@@ -88,7 +88,7 @@ func (s *SelectQuery) Select(query string, args ...interface{}) *SelectQuery {
 	return &newQuery
 }
 
-func (s *SelectQuery) Joins(tableName string, on string, joinType JoinType, args ...interface{}) *SelectQuery {
+func (s *SelectQuery) Joins(tableName string, on string, joinType JoinType, args ...any) *SelectQuery {
 	args, _ = unifyArgs(args...)
 	join := joinClause{
 		tableName: tableName,
@@ -101,9 +101,9 @@ func (s *SelectQuery) Joins(tableName string, on string, joinType JoinType, args
 	return &newQuery
 }
 
-func unifyArgs(args ...interface{}) ([]interface{}, int) {
+func unifyArgs(args ...any) ([]any, int) {
 	count := 0
-	var newArgs []interface{}
+	var newArgs []any
 	for _, arg := range args {
 		s := reflect.ValueOf(arg)
 		switch reflect.TypeOf(arg).Kind() {
@@ -120,9 +120,9 @@ func unifyArgs(args ...interface{}) ([]interface{}, int) {
 	return newArgs, count
 }
 
-func In(column string, args ...interface{}) (string, []interface{}) {
+func In(column string, args ...any) (string, []any) {
 	args, count := unifyArgs(args...)
-	
+
 	if count == 0 {
 		return "", nil
 	}
@@ -131,14 +131,14 @@ func In(column string, args ...interface{}) (string, []interface{}) {
 	return query, args
 }
 
-func (s *SelectQuery) Where(query string, args ...interface{}) *SelectQuery {
+func (s *SelectQuery) Where(query string, args ...any) *SelectQuery {
 	args, _ = unifyArgs(args...)
 	condition := whereClause{
 		query: query,
 		args:  args,
 	}
 	newQuery := *s
-	
+
 	newQuery.conditions = append(newQuery.conditions, condition)
 	return &newQuery
 }
@@ -173,11 +173,11 @@ func (s *SelectQuery) Offset(offset int64) *SelectQuery {
 	return &newQuery
 }
 
-func (s *SelectQuery) Build() (string, []interface{}, error) {
+func (s *SelectQuery) Build() (string, []any, error) {
 	if s.from == "" {
 		return "", nil, errors.New(ErrTableIsEmpty)
 	}
-	var args []interface{}
+	var args []any
 	var columns string
 	//
 	// check for columns
@@ -250,7 +250,7 @@ func (s *SelectQuery) Build() (string, []interface{}, error) {
 			return "", nil, errors.New(ErrOffsetNotInteger)
 		}
 	}
-	
+
 	// compare the number of args and ? in tableName
 	if len(args) != strings.Count(query, "?") {
 		return "", nil, errors.New(ErrWrongNumberOfArgs)
