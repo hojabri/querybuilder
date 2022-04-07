@@ -183,3 +183,81 @@ func TestIn(t *testing.T) {
 	})
 
 }
+
+func TestSelectQuery_Rebind(t *testing.T) {
+	type args struct {
+		query string
+	}
+	tests := []struct {
+		name        string
+		selectQuery *SelectQuery
+		want        string
+	}{
+		{
+			name:        "test Postgres",
+			selectQuery: SelectByDriver(DriverPostgres).Table("table1").Where("id=?", 100),
+			want:        "SELECT * FROM table1 WHERE (id=$1)",
+		},
+		{
+			name:        "test PGX",
+			selectQuery: SelectByDriver(DriverPGX).Table("table1").Where("id=?", 100),
+			want:        "SELECT * FROM table1 WHERE (id=$1)",
+		},
+		{
+			name:        "test pq-timeouts",
+			selectQuery: SelectByDriver(DriverPqTimeout).Table("table1").Where("id=?", 100),
+			want:        "SELECT * FROM table1 WHERE (id=$1)",
+		},
+		{
+			name:        "test CloudSqlPostgres",
+			selectQuery: SelectByDriver(DriverCloudSqlPostgres).Table("table1").Where("id=?", 100),
+			want:        "SELECT * FROM table1 WHERE (id=$1)",
+		},
+		{
+			name:        "test MySQL",
+			selectQuery: SelectByDriver(DriverMySQL).Table("table1").Where("id=?", 100),
+			want:        "SELECT * FROM table1 WHERE (id=?)",
+		},
+		{
+			name:        "test Sqlite3",
+			selectQuery: SelectByDriver(DriverSqlite3).Table("table1").Where("id=?", 100),
+			want:        "SELECT * FROM table1 WHERE (id=?)",
+		},
+		{
+			name:        "test oci8",
+			selectQuery: SelectByDriver(DriverOCI8).Table("table1").Where("id=?", 100),
+			want:        "SELECT * FROM table1 WHERE (id=:arg1)",
+		},
+		{
+			name:        "test ora",
+			selectQuery: SelectByDriver(DriverORA).Table("table1").Where("id=?", 100),
+			want:        "SELECT * FROM table1 WHERE (id=:arg1)",
+		},
+		{
+			name:        "test goracle",
+			selectQuery: SelectByDriver(DriverGORACLE).Table("table1").Where("id=?", 100),
+			want:        "SELECT * FROM table1 WHERE (id=:arg1)",
+		},
+		{
+			name:        "test SqlServer",
+			selectQuery: SelectByDriver(DriverSqlServer).Table("table1").Where("id=?", 100),
+			want:        "SELECT * FROM table1 WHERE (id=@p1)",
+		},
+		{
+			name:        "test unknown",
+			selectQuery: SelectByDriver("abcdefg").Table("table1").Where("id=?", 100),
+			want:        "SELECT * FROM table1 WHERE (id=?)",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			query, _, err := tt.selectQuery.Build()
+			if err != nil {
+				t.Errorf("can't build the query: %s", err)
+			}
+			if got := tt.selectQuery.Rebind(query); got != tt.want {
+				require.Equal(t, tt.want, got, "Rebind() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

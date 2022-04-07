@@ -77,6 +77,7 @@ type orderByClause struct {
 }
 
 type SelectQuery struct {
+	driver     DriverName
 	columns    []columnClause
 	from       string
 	joins      []joinClause
@@ -275,4 +276,9 @@ func (s *SelectQuery) Build() (string, []any, error) {
 	//
 	// return built tableName and args
 	return query, args, nil
+}
+
+// Rebind transforms a query from QUESTION to the DB driver's bindvar type.
+func (s *SelectQuery) Rebind(query string) string {
+	return rebind(BindType(s.driver), query)
 }
