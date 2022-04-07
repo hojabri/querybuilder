@@ -78,6 +78,13 @@ func TestInsertQuery_Build(t *testing.T) {
 	}
 }
 
+func TestPanicNotStruct(t *testing.T) {
+	require.Panics(t, func() {
+		i := Insert()
+		i.Table("table1").StructValues(123)
+	}, "should panic with non struct types")
+}
+
 func TestInsertQuery_Rebind(t *testing.T) {
 	tests := []struct {
 		name        string

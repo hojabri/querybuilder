@@ -33,7 +33,7 @@ func (s *InsertQuery) StructValues(structure any) *InsertQuery {
 	newQuery := *s
 	m, err := convertStructToMap(structure)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 	newQuery.columnValues = m
 	return &newQuery
