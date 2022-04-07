@@ -48,7 +48,7 @@ func BindType(driverName DriverName) int {
 	return UNKNOWN
 }
 
-// rebind a query from the default bindtype (QUESTION) to the target bindtype.
+// rebind a query table the default bindtype (QUESTION) to the target bindtype.
 func rebind(bindType int, query string) string {
 	switch bindType {
 	case QUESTION, UNKNOWN:

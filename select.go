@@ -3,31 +3,8 @@ package querybuilder
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"strings"
 )
-
-const (
-	ErrTableIsEmpty      = "table name could not be empty"
-	ErrLimitNotInteger   = "LIMIT value is not an integer"
-	ErrOffsetNotInteger  = "OFFSET value is not an integer"
-	ErrWrongNumberOfArgs = "wrong number of arguments"
-)
-
-type columnClause struct {
-	query string
-	args  []any
-}
-
-type whereClause struct {
-	query string
-	args  []any
-}
-
-type havingClause struct {
-	query string
-	args  []any
-}
 
 type JoinType int
 
@@ -50,16 +27,6 @@ func joinTypeString(joinType JoinType) string {
 	}
 }
 
-type joinClause struct {
-	tableName string
-	on        string
-	joinType  JoinType
-	args      []any
-}
-
-type groupByClause struct {
-	fields string
-}
 type OrderDirection int
 
 const (
@@ -76,15 +43,10 @@ func orderDirectionString(direction OrderDirection) string {
 	}
 }
 
-type orderByClause struct {
-	field     string
-	direction OrderDirection
-}
-
 type SelectQuery struct {
 	driver     DriverName
 	columns    []columnClause
-	from       string
+	table      string
 	joins      []joinClause
 	conditions []whereClause
 	havings    []havingClause
@@ -96,7 +58,7 @@ type SelectQuery struct {
 
 func (s *SelectQuery) Table(name string) *SelectQuery {
 	newQuery := *s
-	newQuery.from = name
+	newQuery.table = name
 	return &newQuery
 }
 
@@ -122,36 +84,6 @@ func (s *SelectQuery) Joins(tableName string, on string, joinType JoinType, args
 	newQuery := *s
 	newQuery.joins = append(newQuery.joins, join)
 	return &newQuery
-}
-
-func unifyArgs(args ...any) ([]any, int) {
-	count := 0
-	var newArgs []any
-	for _, arg := range args {
-		s := reflect.ValueOf(arg)
-		switch reflect.TypeOf(arg).Kind() {
-		case reflect.Slice:
-			count = +s.Len()
-			for i := 0; i < s.Len(); i++ {
-				newArgs = append(newArgs, s.Index(i).Interface())
-			}
-		default:
-			count++
-			newArgs = append(newArgs, s.Interface())
-		}
-	}
-	return newArgs, count
-}
-
-func In(column string, args ...any) (string, []any) {
-	args, count := unifyArgs(args...)
-
-	if count == 0 {
-		return "", nil
-	}
-	values := strings.TrimSuffix(strings.Repeat("?,", count), ",")
-	query := fmt.Sprintf("%s IN (%s)", column, values)
-	return query, args
 }
 
 func (s *SelectQuery) Where(query string, args ...any) *SelectQuery {
@@ -210,7 +142,7 @@ func (s *SelectQuery) Offset(offset int64) *SelectQuery {
 }
 
 func (s *SelectQuery) Build() (string, []any, error) {
-	if s.from == "" {
+	if s.table == "" {
 		return "", nil, errors.New(ErrTableIsEmpty)
 	}
 	var args []any
@@ -231,7 +163,7 @@ func (s *SelectQuery) Build() (string, []any, error) {
 	query := "SELECT " + columns
 	//
 	// add table name
-	query = query + " FROM " + s.from
+	query = query + " FROM " + s.table
 	//
 	// add joins
 	if len(s.joins) > 0 {
@@ -306,7 +238,7 @@ func (s *SelectQuery) Build() (string, []any, error) {
 	return query, args, nil
 }
 
-// Rebind transforms a query from QUESTION to the DB driver's bindvar type.
+// Rebind transforms a query table QUESTION to the DB driver's bindvar type.
 func (s *SelectQuery) Rebind(query string) string {
 	return rebind(BindType(s.driver), query)
 }
