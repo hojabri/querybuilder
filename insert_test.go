@@ -14,7 +14,7 @@ func TestInsertQuery_Build(t *testing.T) {
 	sampleStruct := struct {
 		Name  string      `json:"name,omitempty" db:"name"`
 		Email string      `json:"email,omitempty" db:"email"`
-		ID    interface{} `json:"id,omitempty" db:"id"`
+		ID    interface{} `json:"id,omitempty"`
 		Order float32     `json:"order" db:"-"`
 	}{
 		Name:  "Omid",
@@ -54,15 +54,15 @@ func TestInsertQuery_Build(t *testing.T) {
 		{
 			name:      "test4 - non pointer struct",
 			query:     i.Table("table1").StructValues(sampleStruct),
-			wantQuery: "INSERT INTO table1(email,id,name) VALUES(?,?,?)",
-			wantArgs:  []any{"o.hojabri@gmail.com", 74639876, "Omid"},
+			wantQuery: "INSERT INTO table1(ID,email,name) VALUES(?,?,?)",
+			wantArgs:  []any{74639876, "o.hojabri@gmail.com", "Omid"},
 			wantErr:   nil,
 		},
 		{
 			name:      "test5 -with pointer struct",
 			query:     i.Table("table1").StructValues(&sampleStruct),
-			wantQuery: "INSERT INTO table1(email,id,name) VALUES(?,?,?)",
-			wantArgs:  []any{"o.hojabri@gmail.com", 74639876, "Omid"},
+			wantQuery: "INSERT INTO table1(ID,email,name) VALUES(?,?,?)",
+			wantArgs:  []any{74639876, "o.hojabri@gmail.com", "Omid"},
 			wantErr:   nil,
 		},
 	}
