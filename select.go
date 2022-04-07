@@ -55,9 +55,25 @@ type joinClause struct {
 type groupByClause struct {
 	fields string
 }
+type OrderDirection int
+
+const (
+	OrderAsc = iota
+	OrderDesc
+)
+
+func orderDirectionString(direction OrderDirection) string {
+	switch direction {
+	case OrderDesc:
+		return "DESC"
+	default:
+		return "ASC"
+	}
+}
 
 type orderByClause struct {
-	fields string
+	field     string
+	direction OrderDirection
 }
 
 type SelectQuery struct {
@@ -152,9 +168,10 @@ func (s *SelectQuery) Group(query string) *SelectQuery {
 	return &newQuery
 }
 
-func (s *SelectQuery) Order(value string) *SelectQuery {
+func (s *SelectQuery) Order(column string, direction OrderDirection) *SelectQuery {
 	clause := orderByClause{
-		fields: value,
+		field:     column,
+		direction: direction,
 	}
 	newQuery := *s
 	newQuery.orderBy = append(newQuery.orderBy, clause)
@@ -228,7 +245,7 @@ func (s *SelectQuery) Build() (string, []any, error) {
 	if len(s.orderBy) > 0 {
 		var orderBySlice []string
 		for _, orderBy := range s.orderBy {
-			orderBySlice = append(orderBySlice, orderBy.fields)
+			orderBySlice = append(orderBySlice, orderBy.field+" "+orderDirectionString(orderBy.direction))
 		}
 		query = query + " ORDER BY " + strings.Join(orderBySlice, ",")
 	}
