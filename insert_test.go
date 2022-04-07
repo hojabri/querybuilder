@@ -15,6 +15,7 @@ func TestInsertQuery_Build(t *testing.T) {
 		Name  string      `json:"name,omitempty" db:"name"`
 		Email string      `json:"email,omitempty" db:"email"`
 		ID    interface{} `json:"id,omitempty" db:"id"`
+		Order float32     `json:"order" db:"-"`
 	}{
 		Name:  "Omid",
 		Email: "o.hojabri@gmail.com",

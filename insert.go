@@ -54,6 +54,11 @@ func convertStructToMap(s any) (map[string]any, error) {
 	for i := 0; i < e.NumField(); i++ {
 		name := e.Field(i).Name
 		tag := strings.Split(e.Field(i).Tag.Get("db"), ",")[0] // use split to ignore tag "options"
+
+		// ignore columns with -
+		if tag == "-" {
+			continue
+		}
 		value := v.FieldByIndex(e.Field(i).Index)
 		column := tag
 		if tag == "" {
