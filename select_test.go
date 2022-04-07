@@ -198,9 +198,6 @@ func TestIn(t *testing.T) {
 }
 
 func TestSelectQuery_Rebind(t *testing.T) {
-	type args struct {
-		query string
-	}
 	tests := []struct {
 		name        string
 		selectQuery *SelectQuery

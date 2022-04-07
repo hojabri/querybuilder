@@ -56,3 +56,8 @@ func (s *InsertQuery) Build() (string, []any, error) {
 
 	return query, args, nil
 }
+
+// Rebind transforms a query table QUESTION to the DB driver's bindvar type.
+func (s *InsertQuery) Rebind(query string) string {
+	return rebind(BindType(s.driver), query)
+}
