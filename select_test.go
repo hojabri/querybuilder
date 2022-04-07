@@ -8,7 +8,7 @@ import (
 )
 
 func TestSelectQuery_Build(t *testing.T) {
-	s := &SelectQuery{}
+	s := Select()
 	ids := []int{1, 2, 3}
 	tests := []struct {
 		name           string
