@@ -2,6 +2,8 @@ package querybuilder
 
 import (
 	"errors"
+	"log"
+	"reflect"
 	"sort"
 	"strings"
 )
@@ -24,6 +26,42 @@ func (s *InsertQuery) MapValues(columnValues map[string]any) *InsertQuery {
 	newQuery := *s
 	newQuery.columnValues = columnValues
 	return &newQuery
+}
+
+// StructValues gets and struct and extract column/values,
+func (s *InsertQuery) StructValues(structure any) *InsertQuery {
+	newQuery := *s
+	m, err := convertStructToMap(structure)
+	if err != nil {
+		log.Fatal(err)
+	}
+	newQuery.columnValues = m
+	return &newQuery
+}
+
+func convertStructToMap(s any) (map[string]any, error) {
+	columnValues := make(map[string]any)
+	v := reflect.ValueOf(s)
+	// if its a pointer, resolve its value
+	if v.Kind() == reflect.Ptr {
+		v = reflect.Indirect(v)
+	}
+
+	if v.Kind() != reflect.Struct {
+		return nil, errors.New("unexpected type")
+	}
+	e := v.Type()
+	for i := 0; i < e.NumField(); i++ {
+		name := e.Field(i).Name
+		tag := strings.Split(e.Field(i).Tag.Get("db"), ",")[0] // use split to ignore tag "options"
+		value := v.FieldByIndex(e.Field(i).Index)
+		column := tag
+		if tag == "" {
+			column = name
+		}
+		columnValues[column] = value.Interface()
+	}
+	return columnValues, nil
 }
 
 func (s *InsertQuery) Build() (string, []any, error) {
