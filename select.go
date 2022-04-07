@@ -77,7 +77,7 @@ func (s *SelectQuery) Table(name string) *SelectQuery {
 	return &newQuery
 }
 
-func (s *SelectQuery) Select(query string, args ...any) *SelectQuery {
+func (s *SelectQuery) Columns(query string, args ...any) *SelectQuery {
 	args, _ = unifyArgs(args...)
 	column := columnClause{
 		query: query,
