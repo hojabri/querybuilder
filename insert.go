@@ -38,7 +38,7 @@ func (s *InsertQuery) Build() (string, []any, error) {
 
 	// make column slice
 	var columns []string
-	for column, _ := range s.columnValues {
+	for column := range s.columnValues {
 		columns = append(columns, column)
 	}
 
@@ -48,7 +48,6 @@ func (s *InsertQuery) Build() (string, []any, error) {
 	// adding values to args
 	for _, column := range columns {
 		args = append(args, s.columnValues[column])
-
 	}
 	//
 	// add table name

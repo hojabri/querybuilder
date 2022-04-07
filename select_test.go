@@ -194,7 +194,6 @@ func TestIn(t *testing.T) {
 		require.Equal(t, "", query)
 		require.Equal(t, []any(nil), args)
 	})
-
 }
 
 func TestSelectQuery_Rebind(t *testing.T) {

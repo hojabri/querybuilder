@@ -2,8 +2,9 @@ package querybuilder
 
 import (
 	"errors"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestInsertQuery_Build(t *testing.T) {
