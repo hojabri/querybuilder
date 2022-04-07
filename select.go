@@ -24,6 +24,11 @@ type whereClause struct {
 	args  []any
 }
 
+type havingClause struct {
+	query string
+	args  []any
+}
+
 type JoinType int
 
 const (
@@ -82,6 +87,7 @@ type SelectQuery struct {
 	from       string
 	joins      []joinClause
 	conditions []whereClause
+	havings    []havingClause
 	groupBy    []groupByClause
 	orderBy    []orderByClause
 	limit      any
@@ -157,6 +163,18 @@ func (s *SelectQuery) Where(query string, args ...any) *SelectQuery {
 	newQuery := *s
 
 	newQuery.conditions = append(newQuery.conditions, condition)
+	return &newQuery
+}
+
+func (s *SelectQuery) Having(query string, args ...any) *SelectQuery {
+	args, _ = unifyArgs(args...)
+	having := havingClause{
+		query: query,
+		args:  args,
+	}
+	newQuery := *s
+
+	newQuery.havings = append(newQuery.havings, having)
 	return &newQuery
 }
 
@@ -240,6 +258,16 @@ func (s *SelectQuery) Build() (string, []any, error) {
 			groupBySlice = append(groupBySlice, groupBy.fields)
 		}
 		query = query + " GROUP BY " + strings.Join(groupBySlice, ",")
+	}
+	//
+	// add having
+	if len(s.havings) > 0 {
+		var havingSlice []string
+		for _, having := range s.havings {
+			havingSlice = append(havingSlice, fmt.Sprintf("(%s)", having.query))
+			args = append(args, having.args...)
+		}
+		query = query + " HAVING " + strings.Join(havingSlice, " AND ")
 	}
 	//
 	// add order by

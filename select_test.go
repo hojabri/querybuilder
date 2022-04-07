@@ -143,6 +143,19 @@ func TestSelectQuery_Build(t *testing.T) {
 			wantArgs:       []any{1, 2, 3, 4, 5, 6},
 			wantErr:        nil,
 		},
+		{
+			name: "test19",
+			query: s.Table("table1").
+				Columns("SUM(field1) AS total").
+				Where("id > ?", 120).
+				Order("timestamp", OrderDesc).
+				Group("field1,field2").
+				Having("SUM(field1)>10").
+				Limit(1000).Offset(0),
+			wantBuiltQuery: "SELECT SUM(field1) AS total FROM table1 WHERE (id > ?) GROUP BY field1,field2 HAVING (SUM(field1)>10) ORDER BY timestamp DESC LIMIT 1000 OFFSET 0",
+			wantArgs:       []any{120},
+			wantErr:        nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
