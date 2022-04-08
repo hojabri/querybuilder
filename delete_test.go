@@ -30,6 +30,13 @@ func TestDeleteQuery_Build(t *testing.T) {
 			wantArgs:  []any{5000},
 			wantErr:   nil,
 		},
+		{
+			name:      "test3 - wrong number of arguments",
+			query:     d.Table("table1").Where("id=?", 5000, 10),
+			wantQuery: "",
+			wantArgs:  []any(nil),
+			wantErr:   errors.New(ErrWrongNumberOfArgs),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

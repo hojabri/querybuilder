@@ -62,6 +62,13 @@ func TestUpdateQuery_Build(t *testing.T) {
 			wantArgs:  []any{"Omid", "o.hojabri@gmail.com", 74639876, 5000},
 			wantErr:   nil,
 		},
+		{
+			name:      "test6 -wrong number of arguments",
+			query:     u.Table("table1").StructValues(&sampleStruct).Where("id=?"),
+			wantQuery: "",
+			wantArgs:  []any(nil),
+			wantErr:   errors.New(ErrWrongNumberOfArgs),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
