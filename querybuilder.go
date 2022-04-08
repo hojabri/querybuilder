@@ -35,3 +35,15 @@ func UpdateByDriver(driver DriverName) *UpdateQuery {
 	uq := UpdateQuery{driver: driver}
 	return &uq
 }
+
+// Delete creates new DeleteQuery
+func Delete() *DeleteQuery {
+	dq := DeleteQuery{}
+	return &dq
+}
+
+// DeleteByDriver creates new DeleteQuery by specifying driver name
+func DeleteByDriver(driver DriverName) *DeleteQuery {
+	dq := DeleteQuery{driver: driver}
+	return &dq
+}
