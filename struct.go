@@ -15,6 +15,7 @@ type KeyValue struct {
 type IndexedColumnValues map[int]KeyValue
 
 func mapToIndexColumnValue(columnValues map[string]any) IndexedColumnValues {
+	//TODO: omit nulls
 	indexedColumnValues := make(IndexedColumnValues, len(columnValues))
 	columns := make([]string, len(columnValues))
 	i := 0
