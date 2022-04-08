@@ -61,11 +61,6 @@ func (s *InsertQuery) Build() (string, []any, error) {
 	// add table name
 	query = "INSERT INTO " + s.table + "(" + strings.Join(columns, ",") + ") VALUES(" + strings.TrimSuffix(strings.Repeat("?,", len(columns)), ",") + ")"
 	
-	// compare the number of args and ? in tableName
-	if len(args) != strings.Count(query, "?") {
-		return "", nil, errors.New(ErrWrongNumberOfArgs)
-	}
-	
 	return query, args, nil
 }
 
