@@ -23,3 +23,15 @@ func InsertByDriver(driver DriverName) *InsertQuery {
 	iq := InsertQuery{driver: driver}
 	return &iq
 }
+
+// Update creates new UpdateQuery
+func Update() *UpdateQuery {
+	uq := UpdateQuery{}
+	return &uq
+}
+
+// UpdateByDriver creates new UpdateQuery by specifying driver name
+func UpdateByDriver(driver DriverName) *UpdateQuery {
+	uq := UpdateQuery{driver: driver}
+	return &uq
+}

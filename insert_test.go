@@ -4,13 +4,13 @@ import (
 	"errors"
 	"testing"
 	"time"
-
+	
 	"github.com/stretchr/testify/require"
 )
 
 func TestInsertQuery_Build(t *testing.T) {
 	i := Insert()
-
+	
 	sampleStruct := struct {
 		Name  string      `json:"name,omitempty" db:"name"`
 		Email string      `json:"email,omitempty" db:"email"`
@@ -21,7 +21,7 @@ func TestInsertQuery_Build(t *testing.T) {
 		Email: "o.hojabri@gmail.com",
 		ID:    74639876,
 	}
-
+	
 	tests := []struct {
 		name      string
 		query     *InsertQuery
@@ -36,7 +36,6 @@ func TestInsertQuery_Build(t *testing.T) {
 			wantArgs:  []any(nil),
 			wantErr:   errors.New(ErrColumnValueMapIsEmpty),
 		},
-
 		{
 			name:      "test2",
 			query:     i,
@@ -54,15 +53,15 @@ func TestInsertQuery_Build(t *testing.T) {
 		{
 			name:      "test4 - non pointer struct",
 			query:     i.Table("table1").StructValues(sampleStruct),
-			wantQuery: "INSERT INTO table1(ID,email,name) VALUES(?,?,?)",
-			wantArgs:  []any{74639876, "o.hojabri@gmail.com", "Omid"},
+			wantQuery: "INSERT INTO table1(name,email,ID) VALUES(?,?,?)",
+			wantArgs:  []any{"Omid", "o.hojabri@gmail.com", 74639876},
 			wantErr:   nil,
 		},
 		{
 			name:      "test5 -with pointer struct",
 			query:     i.Table("table1").StructValues(&sampleStruct),
-			wantQuery: "INSERT INTO table1(ID,email,name) VALUES(?,?,?)",
-			wantArgs:  []any{74639876, "o.hojabri@gmail.com", "Omid"},
+			wantQuery: "INSERT INTO table1(name,email,ID) VALUES(?,?,?)",
+			wantArgs:  []any{"Omid", "o.hojabri@gmail.com", 74639876},
 			wantErr:   nil,
 		},
 	}
@@ -78,7 +77,7 @@ func TestInsertQuery_Build(t *testing.T) {
 	}
 }
 
-func TestPanicNotStruct(t *testing.T) {
+func TestInsertPanicNotStruct(t *testing.T) {
 	require.Panics(t, func() {
 		i := Insert()
 		i.Table("table1").StructValues(123)
