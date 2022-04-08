@@ -69,6 +69,10 @@ func structToMap(s any) (IndexedColumnValues, error) {
 		if value.Kind() == reflect.Ptr {
 			value = reflect.Indirect(value)
 		}
+		// if the value is nil, skip adding it
+		if value.Interface() == nil {
+			continue
+		}
 		
 		columnValues[columnIndex] = KeyValue{Key: column, Value: value.Interface()}
 		columnIndex++

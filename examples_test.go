@@ -163,3 +163,74 @@ func ExampleSelect() {
 	//Sample11: query:SELECT c1,c2 FROM table1 ORDER BY c1 DESC,c2 ASC args:[]
 	//Sample12: query:SELECT c1,c2 FROM table1 LIMIT 20 OFFSET 0 args:[]
 }
+
+func ExampleInsert() {
+	type sampleStructType struct {
+		Name  string      `json:"name,omitempty" db:"name"`
+		Email string      `json:"email,omitempty" db:"email"`
+		ID    interface{} `json:"id,omitempty"`
+		Order float32     `json:"order" db:"-"`
+		Image *[]byte     `json:"image" db:"image"`
+		Grade int         `json:"grade" db:"grade"`
+	}
+	sampleImage := []byte("img")
+	
+	sq := querybuilder.Insert()
+	
+	// Sample01 with map[string]any or map[string]interface{} as input
+	query, args, err := sq.
+		Table("table1").
+		MapValues(map[string]any{"field1": "value1", "field2": 10}).
+		Build()
+	if err != nil {
+		log.Printf("err: %s", err)
+	}
+	fmt.Printf("Sample01: query:%s args:%v\n", query, args)
+	
+	// Sample02 with Structure as input
+	query, args, err = sq.
+		Table("table1").
+		StructValues(sampleStructType{
+			Name:  "Omid",
+			Email: "o.hojabri@gmail.com",
+			ID:    nil,
+			Order: 1,
+			Image: &sampleImage,
+			Grade: 10,
+		}).
+		Build()
+	if err != nil {
+		log.Printf("err: %s", err)
+	}
+	fmt.Printf("Sample02: query:%s args:%v\n", query, args)
+	
+	// Sample03 with Structure as input - skipping null value for pointers
+	query, args, err = sq.
+		Table("table1").
+		StructValues(sampleStructType{
+			Name:  "Omid",
+			Email: "o.hojabri@gmail.com",
+			ID:    nil,
+			Order: 1,
+			Grade: 10,
+		}).
+		Build()
+	if err != nil {
+		log.Printf("err: %s", err)
+	}
+	fmt.Printf("Sample03: query:%s args:%v\n", query, args)
+	
+	// Sample04 nil column/value
+	_, _, err = sq.
+		Table("table1").
+		Build()
+	if err != nil {
+		fmt.Printf("Sample04: err: %s", err)
+	}
+	
+	// Output:
+	//Sample01: query:INSERT INTO table1(field1,field2) VALUES(?,?) args:[value1 10]
+	//Sample02: query:INSERT INTO table1(name,email,image,grade) VALUES(?,?,?,?) args:[Omid o.hojabri@gmail.com [105 109 103] 10]
+	//Sample03: query:INSERT INTO table1(name,email,grade) VALUES(?,?,?) args:[Omid o.hojabri@gmail.com 10]
+	//Sample04: err: column/value map is empty
+}
