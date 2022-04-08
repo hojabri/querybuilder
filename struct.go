@@ -15,7 +15,6 @@ type KeyValue struct {
 type IndexedColumnValues map[int]KeyValue
 
 func mapToIndexColumnValue(columnValues map[string]any) IndexedColumnValues {
-	//TODO: omit nulls
 	indexedColumnValues := make(IndexedColumnValues, len(columnValues))
 	columns := make([]string, len(columnValues))
 	i := 0
@@ -47,6 +46,7 @@ func structToMap(s any) (IndexedColumnValues, error) {
 		return nil, errors.New("unexpected type")
 	}
 	e := v.Type()
+	columnIndex := 0
 	for i := 0; i < e.NumField(); i++ {
 		name := e.Field(i).Name
 		tag := strings.Split(e.Field(i).Tag.Get("db"), ",")[0] // use split to ignore tag "options"
@@ -60,7 +60,18 @@ func structToMap(s any) (IndexedColumnValues, error) {
 		if tag == "" {
 			column = name
 		}
-		columnValues[i] = KeyValue{Key: column, Value: value.Interface()}
+		
+		// ignore nil pointer values
+		if value.IsZero() && value.Kind() == reflect.Ptr {
+			continue
+		}
+		// if the value is a pointer, resolve its value
+		if value.Kind() == reflect.Ptr {
+			value = reflect.Indirect(value)
+		}
+		
+		columnValues[columnIndex] = KeyValue{Key: column, Value: value.Interface()}
+		columnIndex++
 	}
 	return columnValues, nil
 }
