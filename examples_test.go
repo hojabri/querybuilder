@@ -306,3 +306,44 @@ func ExampleUpdate() {
 	//Sample04: err: column/value map is empty
 	
 }
+
+func ExampleDelete() {
+	sq := querybuilder.Delete()
+	
+	// Sample01
+	query, args, err := sq.
+		Table("table1").
+		Where("id=?", 10).
+		Build()
+	if err != nil {
+		log.Printf("err: %s", err)
+	}
+	fmt.Printf("Sample01: query:%s args:%v\n", query, args)
+	
+	// Sample02
+	query, args, err = sq.
+		Table("table1").
+		Where("id=?", 10).
+		Where("email=? OR name=?", "o.hojabri@gmail.com", "Omid").
+		Build()
+	if err != nil {
+		log.Printf("err: %s", err)
+	}
+	fmt.Printf("Sample02: query:%s args:%v\n", query, args)
+	
+	// Sample03- wrong number of arguments
+	_, _, err = sq.
+		Table("table1").
+		Where("id=?", 10).
+		Where("email=? OR name=?", "o.hojabri@gmail.com").
+		Build()
+	if err != nil {
+		fmt.Printf("Sample03: err: %s", err)
+	}
+	
+	// Output:
+	//Sample01: query:DELETE FROM table1 WHERE (id=?) args:[10]
+	//Sample02: query:DELETE FROM table1 WHERE (id=?) AND (email=? OR name=?) args:[10 o.hojabri@gmail.com Omid]
+	//Sample03: err: wrong number of arguments
+	
+}

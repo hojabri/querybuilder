@@ -26,7 +26,7 @@ func TestDeleteQuery_Build(t *testing.T) {
 		{
 			name:      "test2",
 			query:     d.Table("table1").Where("id=?", 5000),
-			wantQuery: "DELETE table1 WHERE (id=?)",
+			wantQuery: "DELETE FROM table1 WHERE (id=?)",
 			wantArgs:  []any{5000},
 			wantErr:   nil,
 		},
@@ -52,57 +52,57 @@ func TestDeleteQuery_Rebind(t *testing.T) {
 		{
 			name:        "test Postgres",
 			deleteQuery: DeleteByDriver(DriverPostgres).Table("table1").Where("id=?", 5000),
-			want:        "DELETE table1 WHERE (id=$1)",
+			want:        "DELETE FROM table1 WHERE (id=$1)",
 		},
 		{
 			name:        "test PGX",
 			deleteQuery: DeleteByDriver(DriverPGX).Table("table1").Where("id=?", 5000),
-			want:        "DELETE table1 WHERE (id=$1)",
+			want:        "DELETE FROM table1 WHERE (id=$1)",
 		},
 		{
 			name:        "test pq-timeouts",
 			deleteQuery: DeleteByDriver(DriverPqTimeout).Table("table1").Where("id=?", 5000),
-			want:        "DELETE table1 WHERE (id=$1)",
+			want:        "DELETE FROM table1 WHERE (id=$1)",
 		},
 		{
 			name:        "test CloudSqlPostgres",
 			deleteQuery: DeleteByDriver(DriverCloudSqlPostgres).Table("table1").Where("id=?", 5000),
-			want:        "DELETE table1 WHERE (id=$1)",
+			want:        "DELETE FROM table1 WHERE (id=$1)",
 		},
 		{
 			name:        "test MySQL",
 			deleteQuery: DeleteByDriver(DriverMySQL).Table("table1").Where("id=?", 5000),
-			want:        "DELETE table1 WHERE (id=?)",
+			want:        "DELETE FROM table1 WHERE (id=?)",
 		},
 		{
 			name:        "test Sqlite3",
 			deleteQuery: DeleteByDriver(DriverSqlite3).Table("table1").Where("id=?", 5000),
-			want:        "DELETE table1 WHERE (id=?)",
+			want:        "DELETE FROM table1 WHERE (id=?)",
 		},
 		{
 			name:        "test oci8",
 			deleteQuery: DeleteByDriver(DriverOCI8).Table("table1").Where("id=?", 5000),
-			want:        "DELETE table1 WHERE (id=:arg1)",
+			want:        "DELETE FROM table1 WHERE (id=:arg1)",
 		},
 		{
 			name:        "test ora",
 			deleteQuery: DeleteByDriver(DriverORA).Table("table1").Where("id=?", 5000),
-			want:        "DELETE table1 WHERE (id=:arg1)",
+			want:        "DELETE FROM table1 WHERE (id=:arg1)",
 		},
 		{
 			name:        "test goracle",
 			deleteQuery: DeleteByDriver(DriverGORACLE).Table("table1").Where("id=?", 5000),
-			want:        "DELETE table1 WHERE (id=:arg1)",
+			want:        "DELETE FROM table1 WHERE (id=:arg1)",
 		},
 		{
 			name:        "test SqlServer",
 			deleteQuery: DeleteByDriver(DriverSqlServer).Table("table1").Where("id=?", 5000),
-			want:        "DELETE table1 WHERE (id=@p1)",
+			want:        "DELETE FROM table1 WHERE (id=@p1)",
 		},
 		{
 			name:        "test unknown",
 			deleteQuery: DeleteByDriver("abcdefg").Table("table1").Where("id=?", 5000),
-			want:        "DELETE table1 WHERE (id=?)",
+			want:        "DELETE FROM table1 WHERE (id=?)",
 		},
 	}
 	for _, tt := range tests {

@@ -38,7 +38,7 @@ func (s *DeleteQuery) Build() (string, []any, error) {
 	var query string
 	var args []any
 	
-	query = "DELETE " + s.table
+	query = "DELETE FROM " + s.table
 	
 	//
 	// check for where part
@@ -49,6 +49,11 @@ func (s *DeleteQuery) Build() (string, []any, error) {
 			args = append(args, condition.args...)
 		}
 		query = query + " WHERE " + strings.Join(conditionsSlice, " AND ")
+	}
+	
+	// compare the number of args and ? in tableName
+	if len(args) != strings.Count(query, "?") {
+		return "", nil, errors.New(ErrWrongNumberOfArgs)
 	}
 	
 	return query, args, nil

@@ -85,6 +85,11 @@ func (s *UpdateQuery) Build() (string, []any, error) {
 		query = query + " WHERE " + strings.Join(conditionsSlice, " AND ")
 	}
 	
+	// compare the number of args and ? in tableName
+	if len(args) != strings.Count(query, "?") {
+		return "", nil, errors.New(ErrWrongNumberOfArgs)
+	}
+	
 	return query, args, nil
 }
 
