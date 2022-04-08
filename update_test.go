@@ -20,6 +20,7 @@ func TestUpdateQuery_Build(t *testing.T) {
 	}
 	
 	u := Update()
+	
 	tests := []struct {
 		name      string
 		query     *UpdateQuery
