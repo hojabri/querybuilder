@@ -25,49 +25,49 @@ func TestUpdateQuery_Build(t *testing.T) {
 		name      string
 		query     *UpdateQuery
 		wantQuery string
-		wantArgs  []any
+		wantArgs  []interface{}
 		wantErr   error
 	}{
 		{
 			name:      "test1",
 			query:     u.Table("table1").MapValues(nil),
 			wantQuery: "",
-			wantArgs:  []any(nil),
+			wantArgs:  []interface{}(nil),
 			wantErr:   errors.New(ErrColumnValueMapIsEmpty),
 		},
 		{
 			name:      "test2",
 			query:     u,
 			wantQuery: "",
-			wantArgs:  []any(nil),
+			wantArgs:  []interface{}(nil),
 			wantErr:   errors.New(ErrTableIsEmpty),
 		},
 		{
 			name:      "test3",
-			query:     u.Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			query:     u.Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			wantQuery: "UPDATE table1 SET field1=?,field2=? WHERE (id=?)",
-			wantArgs:  []any{10, "test", 5000},
+			wantArgs:  []interface{}{10, "test", 5000},
 			wantErr:   nil,
 		},
 		{
 			name:      "test4 - non pointer struct",
 			query:     u.Table("table1").StructValues(sampleStruct).Where("id=?", 5000),
 			wantQuery: "UPDATE table1 SET name=?,email=?,ID=? WHERE (id=?)",
-			wantArgs:  []any{"Omid", "o.hojabri@gmail.com", 74639876, 5000},
+			wantArgs:  []interface{}{"Omid", "o.hojabri@gmail.com", 74639876, 5000},
 			wantErr:   nil,
 		},
 		{
 			name:      "test5 -with pointer struct",
 			query:     u.Table("table1").StructValues(&sampleStruct).Where("id=?", 5000),
 			wantQuery: "UPDATE table1 SET name=?,email=?,ID=? WHERE (id=?)",
-			wantArgs:  []any{"Omid", "o.hojabri@gmail.com", 74639876, 5000},
+			wantArgs:  []interface{}{"Omid", "o.hojabri@gmail.com", 74639876, 5000},
 			wantErr:   nil,
 		},
 		{
 			name:      "test6 -wrong number of arguments",
 			query:     u.Table("table1").StructValues(&sampleStruct).Where("id=?"),
 			wantQuery: "",
-			wantArgs:  []any(nil),
+			wantArgs:  []interface{}(nil),
 			wantErr:   errors.New(ErrWrongNumberOfArgs),
 		},
 	}
@@ -98,57 +98,57 @@ func TestUpdateQuery_Rebind(t *testing.T) {
 	}{
 		{
 			name:        "test Postgres",
-			updateQuery: UpdateByDriver(DriverPostgres).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			updateQuery: UpdateByDriver(DriverPostgres).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=$1,field2=$2 WHERE (id=$3)",
 		},
 		{
 			name:        "test PGX",
-			updateQuery: UpdateByDriver(DriverPGX).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			updateQuery: UpdateByDriver(DriverPGX).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=$1,field2=$2 WHERE (id=$3)",
 		},
 		{
 			name:        "test pq-timeouts",
-			updateQuery: UpdateByDriver(DriverPqTimeout).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			updateQuery: UpdateByDriver(DriverPqTimeout).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=$1,field2=$2 WHERE (id=$3)",
 		},
 		{
 			name:        "test CloudSqlPostgres",
-			updateQuery: UpdateByDriver(DriverCloudSqlPostgres).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			updateQuery: UpdateByDriver(DriverCloudSqlPostgres).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=$1,field2=$2 WHERE (id=$3)",
 		},
 		{
 			name:        "test MySQL",
-			updateQuery: UpdateByDriver(DriverMySQL).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			updateQuery: UpdateByDriver(DriverMySQL).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=?,field2=? WHERE (id=?)",
 		},
 		{
 			name:        "test Sqlite3",
-			updateQuery: UpdateByDriver(DriverSqlite3).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			updateQuery: UpdateByDriver(DriverSqlite3).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=?,field2=? WHERE (id=?)",
 		},
 		{
 			name:        "test oci8",
-			updateQuery: UpdateByDriver(DriverOCI8).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			updateQuery: UpdateByDriver(DriverOCI8).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=:arg1,field2=:arg2 WHERE (id=:arg3)",
 		},
 		{
 			name:        "test ora",
-			updateQuery: UpdateByDriver(DriverORA).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			updateQuery: UpdateByDriver(DriverORA).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=:arg1,field2=:arg2 WHERE (id=:arg3)",
 		},
 		{
 			name:        "test goracle",
-			updateQuery: UpdateByDriver(DriverGORACLE).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			updateQuery: UpdateByDriver(DriverGORACLE).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=:arg1,field2=:arg2 WHERE (id=:arg3)",
 		},
 		{
 			name:        "test SqlServer",
-			updateQuery: UpdateByDriver(DriverSqlServer).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			updateQuery: UpdateByDriver(DriverSqlServer).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=@p1,field2=@p2 WHERE (id=@p3)",
 		},
 		{
 			name:        "test unknown",
-			updateQuery: UpdateByDriver("abcdefg").Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			updateQuery: UpdateByDriver("abcdefg").Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=?,field2=? WHERE (id=?)",
 		},
 	}

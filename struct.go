@@ -9,12 +9,12 @@ import (
 
 type KeyValue struct {
 	Key   string
-	Value any
+	Value interface{}
 }
 
 type IndexedColumnValues map[int]KeyValue
 
-func mapToIndexColumnValue(columnValues map[string]any) IndexedColumnValues {
+func mapToIndexColumnValue(columnValues map[string]interface{}) IndexedColumnValues {
 	indexedColumnValues := make(IndexedColumnValues, len(columnValues))
 	columns := make([]string, len(columnValues))
 	i := 0
@@ -34,7 +34,7 @@ func mapToIndexColumnValue(columnValues map[string]any) IndexedColumnValues {
 	return indexedColumnValues
 }
 
-func structToMap(s any) (IndexedColumnValues, error) {
+func structToMap(s interface{}) (IndexedColumnValues, error) {
 	columnValues := make(IndexedColumnValues)
 	v := reflect.ValueOf(s)
 	// if its a pointer, resolve its value

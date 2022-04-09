@@ -20,14 +20,14 @@ func (s *InsertQuery) Table(name string) *InsertQuery {
 
 // MapValues gets columns and values,
 // Enter Column/Values as a key/value map
-func (s *InsertQuery) MapValues(columnValues map[string]any) *InsertQuery {
+func (s *InsertQuery) MapValues(columnValues map[string]interface{}) *InsertQuery {
 	newQuery := *s
 	newQuery.indexedColumnValues = mapToIndexColumnValue(columnValues)
 	return &newQuery
 }
 
 // StructValues gets and struct and extract column/values,
-func (s *InsertQuery) StructValues(structure any) *InsertQuery {
+func (s *InsertQuery) StructValues(structure interface{}) *InsertQuery {
 	newQuery := *s
 	m, err := structToMap(structure)
 	if err != nil {
@@ -37,7 +37,7 @@ func (s *InsertQuery) StructValues(structure any) *InsertQuery {
 	return &newQuery
 }
 
-func (s *InsertQuery) Build() (string, []any, error) {
+func (s *InsertQuery) Build() (string, []interface{}, error) {
 	if s.table == "" {
 		return "", nil, errors.New(ErrTableIsEmpty)
 	}
@@ -46,7 +46,7 @@ func (s *InsertQuery) Build() (string, []any, error) {
 	}
 	var query string
 	
-	args := make([]any, len(s.indexedColumnValues))
+	args := make([]interface{}, len(s.indexedColumnValues))
 	
 	// make column slice
 	columns := make([]string, len(s.indexedColumnValues))

@@ -177,10 +177,10 @@ func ExampleInsert() {
 	
 	sq := querybuilder.Insert()
 	
-	// Sample01 with map[string]any or map[string]interface{} as input
+	// Sample01 with map[string]interface{} as input
 	query, args, err := sq.
 		Table("table1").
-		MapValues(map[string]any{"field1": "value1", "field2": 10}).
+		MapValues(map[string]interface{}{"field1": "value1", "field2": 10}).
 		Build()
 	if err != nil {
 		log.Printf("err: %s", err)
@@ -248,10 +248,10 @@ func ExampleUpdate() {
 	
 	sq := querybuilder.Update()
 	
-	// Sample01 with map[string]any or map[string]interface{} as input
+	// Sample01 with map[string]interface{} as input
 	query, args, err := sq.
 		Table("table1").
-		MapValues(map[string]any{"field1": "value1", "field2": 10}).
+		MapValues(map[string]interface{}{"field1": "value1", "field2": 10}).
 		Build()
 	if err != nil {
 		log.Printf("err: %s", err)

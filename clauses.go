@@ -2,24 +2,24 @@ package querybuilder
 
 type columnClause struct {
 	query string
-	args  []any
+	args  []interface{}
 }
 
 type whereClause struct {
 	query string
-	args  []any
+	args  []interface{}
 }
 
 type havingClause struct {
 	query string
-	args  []any
+	args  []interface{}
 }
 
 type joinClause struct {
 	tableName string
 	on        string
 	joinType  JoinType
-	args      []any
+	args      []interface{}
 }
 
 type groupByClause struct {

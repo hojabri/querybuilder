@@ -13,28 +13,28 @@ func TestDeleteQuery_Build(t *testing.T) {
 		name      string
 		query     *DeleteQuery
 		wantQuery string
-		wantArgs  []any
+		wantArgs  []interface{}
 		wantErr   error
 	}{
 		{
 			name:      "test1",
 			query:     d,
 			wantQuery: "",
-			wantArgs:  []any(nil),
+			wantArgs:  []interface{}(nil),
 			wantErr:   errors.New(ErrTableIsEmpty),
 		},
 		{
 			name:      "test2",
 			query:     d.Table("table1").Where("id=?", 5000),
 			wantQuery: "DELETE FROM table1 WHERE (id=?)",
-			wantArgs:  []any{5000},
+			wantArgs:  []interface{}{5000},
 			wantErr:   nil,
 		},
 		{
 			name:      "test3 - wrong number of arguments",
 			query:     d.Table("table1").Where("id=?", 5000, 10),
 			wantQuery: "",
-			wantArgs:  []any(nil),
+			wantArgs:  []interface{}(nil),
 			wantErr:   errors.New(ErrWrongNumberOfArgs),
 		},
 	}

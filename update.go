@@ -20,7 +20,7 @@ func (s *UpdateQuery) Table(name string) *UpdateQuery {
 	return &newQuery
 }
 
-func (s *UpdateQuery) Where(query string, args ...any) *UpdateQuery {
+func (s *UpdateQuery) Where(query string, args ...interface{}) *UpdateQuery {
 	args, _ = unifyArgs(args...)
 	condition := whereClause{
 		query: query,
@@ -34,14 +34,14 @@ func (s *UpdateQuery) Where(query string, args ...any) *UpdateQuery {
 
 // MapValues gets columns and values,
 // Enter Column/Values as a key/value map
-func (s *UpdateQuery) MapValues(columnValues map[string]any) *UpdateQuery {
+func (s *UpdateQuery) MapValues(columnValues map[string]interface{}) *UpdateQuery {
 	newQuery := *s
 	newQuery.indexedColumnValues = mapToIndexColumnValue(columnValues)
 	return &newQuery
 }
 
 // StructValues gets and struct and extract column/values,
-func (s *UpdateQuery) StructValues(structure any) *UpdateQuery {
+func (s *UpdateQuery) StructValues(structure interface{}) *UpdateQuery {
 	newQuery := *s
 	m, err := structToMap(structure)
 	if err != nil {
@@ -51,7 +51,7 @@ func (s *UpdateQuery) StructValues(structure any) *UpdateQuery {
 	return &newQuery
 }
 
-func (s *UpdateQuery) Build() (string, []any, error) {
+func (s *UpdateQuery) Build() (string, []interface{}, error) {
 	if s.table == "" {
 		return "", nil, errors.New(ErrTableIsEmpty)
 	}
@@ -59,7 +59,7 @@ func (s *UpdateQuery) Build() (string, []any, error) {
 		return "", nil, errors.New(ErrColumnValueMapIsEmpty)
 	}
 	var query string
-	args := make([]any, len(s.indexedColumnValues))
+	args := make([]interface{}, len(s.indexedColumnValues))
 	
 	// make column slice
 	columns := make([]string, len(s.indexedColumnValues))

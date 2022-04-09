@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-func unifyArgs(args ...any) ([]any, int) {
+func unifyArgs(args ...interface{}) ([]interface{}, int) {
 	count := 0
-	var newArgs []any
+	var newArgs []interface{}
 	for _, arg := range args {
 		s := reflect.ValueOf(arg)
 		switch reflect.TypeOf(arg).Kind() {
@@ -25,9 +25,9 @@ func unifyArgs(args ...any) ([]any, int) {
 	return newArgs, count
 }
 
-func In(column string, args ...any) (string, []any) {
+func In(column string, args ...interface{}) (string, []interface{}) {
 	args, count := unifyArgs(args...)
-
+	
 	if count == 0 {
 		return "", nil
 	}

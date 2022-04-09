@@ -18,7 +18,7 @@ func (s *DeleteQuery) Table(name string) *DeleteQuery {
 	return &newQuery
 }
 
-func (s *DeleteQuery) Where(query string, args ...any) *DeleteQuery {
+func (s *DeleteQuery) Where(query string, args ...interface{}) *DeleteQuery {
 	args, _ = unifyArgs(args...)
 	condition := whereClause{
 		query: query,
@@ -30,13 +30,13 @@ func (s *DeleteQuery) Where(query string, args ...any) *DeleteQuery {
 	return &newQuery
 }
 
-func (s *DeleteQuery) Build() (string, []any, error) {
+func (s *DeleteQuery) Build() (string, []interface{}, error) {
 	if s.table == "" {
 		return "", nil, errors.New(ErrTableIsEmpty)
 	}
 	
 	var query string
-	var args []any
+	var args []interface{}
 	
 	query = "DELETE FROM " + s.table
 	

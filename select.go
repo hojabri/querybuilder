@@ -52,8 +52,8 @@ type SelectQuery struct {
 	havings    []havingClause
 	groupBy    []groupByClause
 	orderBy    []orderByClause
-	limit      any
-	offset     any
+	limit      interface{}
+	offset     interface{}
 }
 
 func (s *SelectQuery) Table(name string) *SelectQuery {
@@ -62,7 +62,7 @@ func (s *SelectQuery) Table(name string) *SelectQuery {
 	return &newQuery
 }
 
-func (s *SelectQuery) Columns(query string, args ...any) *SelectQuery {
+func (s *SelectQuery) Columns(query string, args ...interface{}) *SelectQuery {
 	args, _ = unifyArgs(args...)
 	column := columnClause{
 		query: query,
@@ -73,7 +73,7 @@ func (s *SelectQuery) Columns(query string, args ...any) *SelectQuery {
 	return &newQuery
 }
 
-func (s *SelectQuery) Joins(tableName string, on string, joinType JoinType, args ...any) *SelectQuery {
+func (s *SelectQuery) Joins(tableName string, on string, joinType JoinType, args ...interface{}) *SelectQuery {
 	args, _ = unifyArgs(args...)
 	join := joinClause{
 		tableName: tableName,
@@ -86,26 +86,26 @@ func (s *SelectQuery) Joins(tableName string, on string, joinType JoinType, args
 	return &newQuery
 }
 
-func (s *SelectQuery) Where(query string, args ...any) *SelectQuery {
+func (s *SelectQuery) Where(query string, args ...interface{}) *SelectQuery {
 	args, _ = unifyArgs(args...)
 	condition := whereClause{
 		query: query,
 		args:  args,
 	}
 	newQuery := *s
-
+	
 	newQuery.conditions = append(newQuery.conditions, condition)
 	return &newQuery
 }
 
-func (s *SelectQuery) Having(query string, args ...any) *SelectQuery {
+func (s *SelectQuery) Having(query string, args ...interface{}) *SelectQuery {
 	args, _ = unifyArgs(args...)
 	having := havingClause{
 		query: query,
 		args:  args,
 	}
 	newQuery := *s
-
+	
 	newQuery.havings = append(newQuery.havings, having)
 	return &newQuery
 }
@@ -141,11 +141,11 @@ func (s *SelectQuery) Offset(offset int64) *SelectQuery {
 	return &newQuery
 }
 
-func (s *SelectQuery) Build() (string, []any, error) {
+func (s *SelectQuery) Build() (string, []interface{}, error) {
 	if s.table == "" {
 		return "", nil, errors.New(ErrTableIsEmpty)
 	}
-	var args []any
+	var args []interface{}
 	var columns string
 	//
 	// check for columns
@@ -228,7 +228,7 @@ func (s *SelectQuery) Build() (string, []any, error) {
 			return "", nil, errors.New(ErrOffsetNotInteger)
 		}
 	}
-
+	
 	// compare the number of args and ? in tableName
 	if len(args) != strings.Count(query, "?") {
 		return "", nil, errors.New(ErrWrongNumberOfArgs)

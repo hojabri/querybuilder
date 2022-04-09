@@ -25,28 +25,28 @@ func TestInsertQuery_Build(t *testing.T) {
 		name      string
 		query     *InsertQuery
 		wantQuery string
-		wantArgs  []any
+		wantArgs  []interface{}
 		wantErr   error
 	}{
 		{
 			name:      "test1",
 			query:     i.Table("table1").MapValues(nil),
 			wantQuery: "",
-			wantArgs:  []any(nil),
+			wantArgs:  []interface{}(nil),
 			wantErr:   errors.New(ErrColumnValueMapIsEmpty),
 		},
 		{
 			name:      "test2",
 			query:     i,
 			wantQuery: "",
-			wantArgs:  []any(nil),
+			wantArgs:  []interface{}(nil),
 			wantErr:   errors.New(ErrTableIsEmpty),
 		},
 		{
 			name:      "test3",
-			query:     i.Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}),
+			query:     i.Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			wantQuery: "INSERT INTO table1(field1,field2) VALUES(?,?)",
-			wantArgs:  []any{10, "test"},
+			wantArgs:  []interface{}{10, "test"},
 			wantErr:   nil,
 		},
 		{
@@ -59,7 +59,7 @@ func TestInsertQuery_Build(t *testing.T) {
 				Grade: 2,
 			}),
 			wantQuery: "INSERT INTO table1(name,email,ID,image,grade) VALUES(?,?,?,?,?)",
-			wantArgs:  []any{"Omid", "o.hojabri@gmail.com", 74639876, sampleImage, 2},
+			wantArgs:  []interface{}{"Omid", "o.hojabri@gmail.com", 74639876, sampleImage, 2},
 			wantErr:   nil,
 		},
 		{
@@ -72,7 +72,7 @@ func TestInsertQuery_Build(t *testing.T) {
 				Grade: 2,
 			}),
 			wantQuery: "INSERT INTO table1(name,email,ID,image,grade) VALUES(?,?,?,?,?)",
-			wantArgs:  []any{"Omid", "o.hojabri@gmail.com", 74639876, sampleImage, 2},
+			wantArgs:  []interface{}{"Omid", "o.hojabri@gmail.com", 74639876, sampleImage, 2},
 			wantErr:   nil,
 		},
 		{
@@ -84,7 +84,7 @@ func TestInsertQuery_Build(t *testing.T) {
 				Image: &sampleImage,
 			}),
 			wantQuery: "INSERT INTO table1(name,email,ID,image,grade) VALUES(?,?,?,?,?)",
-			wantArgs:  []any{"Omid", "o.hojabri@gmail.com", 74639876, sampleImage, 0},
+			wantArgs:  []interface{}{"Omid", "o.hojabri@gmail.com", 74639876, sampleImage, 0},
 			wantErr:   nil,
 		},
 		{
@@ -95,7 +95,7 @@ func TestInsertQuery_Build(t *testing.T) {
 				ID:    74639876,
 			}),
 			wantQuery: "INSERT INTO table1(name,email,ID,grade) VALUES(?,?,?,?)",
-			wantArgs:  []any{"Omid", "o.hojabri@gmail.com", 74639876, 0},
+			wantArgs:  []interface{}{"Omid", "o.hojabri@gmail.com", 74639876, 0},
 			wantErr:   nil,
 		},
 	}
@@ -126,57 +126,57 @@ func TestInsertQuery_Rebind(t *testing.T) {
 	}{
 		{
 			name:        "test Postgres",
-			insertQuery: InsertByDriver(DriverPostgres).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver(DriverPostgres).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES($1,$2)",
 		},
 		{
 			name:        "test PGX",
-			insertQuery: InsertByDriver(DriverPGX).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver(DriverPGX).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES($1,$2)",
 		},
 		{
 			name:        "test pq-timeouts",
-			insertQuery: InsertByDriver(DriverPqTimeout).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver(DriverPqTimeout).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES($1,$2)",
 		},
 		{
 			name:        "test CloudSqlPostgres",
-			insertQuery: InsertByDriver(DriverCloudSqlPostgres).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver(DriverCloudSqlPostgres).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES($1,$2)",
 		},
 		{
 			name:        "test MySQL",
-			insertQuery: InsertByDriver(DriverMySQL).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver(DriverMySQL).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(?,?)",
 		},
 		{
 			name:        "test Sqlite3",
-			insertQuery: InsertByDriver(DriverSqlite3).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver(DriverSqlite3).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(?,?)",
 		},
 		{
 			name:        "test oci8",
-			insertQuery: InsertByDriver(DriverOCI8).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver(DriverOCI8).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(:arg1,:arg2)",
 		},
 		{
 			name:        "test ora",
-			insertQuery: InsertByDriver(DriverORA).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver(DriverORA).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(:arg1,:arg2)",
 		},
 		{
 			name:        "test goracle",
-			insertQuery: InsertByDriver(DriverGORACLE).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver(DriverGORACLE).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(:arg1,:arg2)",
 		},
 		{
 			name:        "test SqlServer",
-			insertQuery: InsertByDriver(DriverSqlServer).Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver(DriverSqlServer).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(@p1,@p2)",
 		},
 		{
 			name:        "test unknown",
-			insertQuery: InsertByDriver("abcdefg").Table("table1").MapValues(map[string]any{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver("abcdefg").Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(?,?)",
 		},
 	}
