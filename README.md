@@ -46,7 +46,7 @@ direction can be one of `OrderAsc` or `OrderDesc`
 - `Rebind(query string)` after your final query string is ready, you can call this method to rebind your query string based on the database driver.
 
 
-####Sample 1
+###Sample 1
 ```go
 	query, args, err := querybuilder.Select().
 		Table("table1").
@@ -59,7 +59,7 @@ Output:
     query:  SELECT * FROM table1
     args:   []
 
-####Sample 2
+###Sample 2
 ```go
 	query, args, err = querybuilder.Select().
 		Table("table1").
@@ -71,7 +71,7 @@ Output:
 
     query:  SELECT c1,c2,c3 FROM table1
     args:   []
-####Sample 3
+###Sample 3
 ```go
 	query, args, err = querybuilder.Select().
 		Table("table1").
@@ -86,7 +86,7 @@ Output:
     query:  SELECT c1,c2,c3 FROM table1 WHERE (c1=true) AND (c2=?)
     args:   [10]
 
-####Sample 4
+###Sample 4
 ```go
 	query, args, err = querybuilder.Select().
 		Table("table1").
@@ -99,7 +99,7 @@ Output:
 
     query:  SELECT c1,c2,c3 FROM table1 WHERE (c1=true) AND (c2=? OR c3>?)
     args:   [10 20]
-####Sample 5
+###Sample 5
 ```go
 	query, args, err = querybuilder.Select().
 		Table("table1").
@@ -112,7 +112,7 @@ Output:
 
     query:  SELECT c1,c2,c3 FROM table1 WHERE (c1=?) AND (c2 IN (?,?))
     args:   [true 10 20]
-####Sample 6
+###Sample 6
 ```go
 	query, args, err = querybuilder.Select().
 		Table("table1").
@@ -126,7 +126,7 @@ Output:
 
     query:  SELECT c1,c2,SUM(c3) AS total FROM table1 WHERE (c1=?) GROUP BY c1,c2 HAVING (SUM(c3)>?)
     args:   [1 100]
-####Sample 7
+###Sample 7
 ```go
 	query, args, err = querybuilder.Select().
 		Table("table1").
@@ -142,7 +142,7 @@ Output:
 
     query:  SELECT c1,c2,SUM(c3) AS total,AVG(c4) AS average FROM table1 WHERE (c1=?) AND (c2=?) GROUP BY c1,c2 HAVING (SUM(c3)>?) AND (AVG(c4)<?)
     args:   [1 true 100 0.1]
-####Sample 8
+###Sample 8
 ```go
 	query, args, err = querybuilder.Select().
 		Table("table1").
@@ -154,7 +154,7 @@ Output:
 
     query:  SELECT id,c1,c2,c3 FROM table1 LEFT JOIN table2 ON table1.id = table2.t_id
     args:   []
-####Sample 9
+###Sample 9
 ```go
 	query, args, err = querybuilder.Select().
 		Table("table1 t1").
@@ -166,7 +166,7 @@ Output:
 
     query:  SELECT t1.id,t2.c3 FROM table1 t1 JOIN table2 t2 ON t1.id = t2.t_id
     args:   []
-####Sample 10
+###Sample 10
 ```go
 	query, args, err = querybuilder.Select().
 		Table("table1").
@@ -178,7 +178,7 @@ Output:
 
     query:  SELECT c1,c2 FROM table1 ORDER BY c1 DESC
     args:   []
-####Sample 11
+###Sample 11
 ```go
 	query, args, err = querybuilder.Select().
 		Table("table1").
@@ -191,7 +191,7 @@ Output:
 
     query:  SELECT c1,c2 FROM table1 ORDER BY c1 DESC,c2 ASC
     args:   []
-####Sample 12
+###Sample 12
 ```go
 	query, args, err = querybuilder.Select().
 		Table("table1").
@@ -239,7 +239,7 @@ Sample struct type for insert examples
 	}
 	sampleImage := []byte("img")
 ```
-####Sample 1
+###Sample 1
 ```go
 	query, args, err := querybuilder.Insert().
 		Table("table1").
@@ -250,7 +250,7 @@ Output:
 
     query:  INSERT INTO table1(field1,field2) VALUES(?,?)
     args:   [value1 10]
-####Sample 2
+###Sample 2
 ```go
 	query, args, err = querybuilder.Insert().
 		Table("table1").
@@ -268,7 +268,7 @@ Output:
 
     query:  INSERT INTO table1(name,email,image,grade) VALUES(?,?,?,?)
     args:   [Omid o.hojabri@gmail.com [105 109 103] 10]
-####Sample 3
+###Sample 3
 ```go
 	query, args, err = querybuilder.Insert().
 		Table("table1").
@@ -324,7 +324,7 @@ Sample struct type for update examples
 	}
 	sampleImage := []byte("img")
 ```
-####Sample 1
+###Sample 1
 ```go
 	query, args, err := querybuilder.Update().
 		Table("table1").
@@ -335,7 +335,7 @@ Output:
 
     query:  UPDATE table1 SET field1=?,field2=?
     args:   [value1 10]
-####Sample 2
+###Sample 2
 ```go
 	query, args, err = querybuilder.Update().
 		Table("table1").
@@ -353,7 +353,7 @@ Output:
 
     query:  UPDATE table1 SET name=?,email=?,image=?,grade=?
     args:   [Omid o.hojabri@gmail.com [105 109 103] 10]
-####Sample 3
+###Sample 3
 ```go
 	query, args, err = querybuilder.Update().
 		Table("table1").
@@ -378,7 +378,7 @@ To build DELETE queries, you need to first call `querybuilder.DELETE()` and then
 - `Rebind(query string)` after your final query string is ready, you can call this method to rebind your query string based on the database driver.
 
 _Note:_ you can have many `Where` functions in any order
-####Sample 1
+###Sample 1
 ```go
 	query, args, err := querybuilder.Delete().
 		Table("table1").
@@ -389,7 +389,7 @@ Output:
 
     query:  DELETE FROM table1 WHERE (id=?)
     args:   [10]
-####Sample 2
+###Sample 2
 ```go
 	query, args, err = querybuilder.Delete().
 		Table("table1").
@@ -402,7 +402,7 @@ Output:
     query:  DELETE FROM table1 WHERE (id=?) AND (email=? OR name=?)
     args:   [10 o.hojabri@gmail.com Omid]
 
-####Specifying database driver
+###Specifying database driver
 If you want to use the `Rebind(query string)` function to rebinding the argument place-holders in your query, you need first specify the database driver.
 
 So instead of using:
