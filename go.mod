@@ -1,6 +1,6 @@
 module github.com/hojabri/querybuilder
 
-go 1.10
+go 1.13
 
 require github.com/stretchr/testify v1.7.1
 
