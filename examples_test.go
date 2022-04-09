@@ -7,10 +7,9 @@ import (
 )
 
 func ExampleSelect() {
-	sq := querybuilder.Select()
 	
 	// Sample01
-	query, args, err := sq.
+	query, args, err := querybuilder.Select().
 		Table("table1").
 		Build()
 	if err != nil {
@@ -19,7 +18,7 @@ func ExampleSelect() {
 	fmt.Printf("Sample01: query:%s args:%v\n", query, args)
 	
 	// Sample02
-	query, args, err = sq.
+	query, args, err = querybuilder.Select().
 		Table("table1").
 		Columns("c1,c2,c3").
 		Build()
@@ -29,7 +28,7 @@ func ExampleSelect() {
 	fmt.Printf("Sample02: query:%s args:%v\n", query, args)
 	
 	// Sample03
-	query, args, err = sq.
+	query, args, err = querybuilder.Select().
 		Table("table1").
 		Columns("c1,c2,c3").
 		Where("c1=true").
@@ -41,7 +40,7 @@ func ExampleSelect() {
 	fmt.Printf("Sample03: query:%s args:%v\n", query, args)
 	
 	// Sample04
-	query, args, err = sq.
+	query, args, err = querybuilder.Select().
 		Table("table1").
 		Columns("c1,c2,c3").
 		Where("c1=true").
@@ -53,7 +52,7 @@ func ExampleSelect() {
 	fmt.Printf("Sample04: query:%s args:%v\n", query, args)
 	
 	// Sample05
-	query, args, err = sq.
+	query, args, err = querybuilder.Select().
 		Table("table1").
 		Columns("c1,c2,c3").
 		Where("c1=?", true).
@@ -65,7 +64,7 @@ func ExampleSelect() {
 	fmt.Printf("Sample05: query:%s args:%v\n", query, args)
 	
 	// Sample06
-	query, args, err = sq.
+	query, args, err = querybuilder.Select().
 		Table("table1").
 		Columns("c1,c2,SUM(c3) AS total").
 		Where("c1=?", 1).
@@ -78,7 +77,7 @@ func ExampleSelect() {
 	fmt.Printf("Sample06: query:%s args:%v\n", query, args)
 	
 	// Sample07
-	query, args, err = sq.
+	query, args, err = querybuilder.Select().
 		Table("table1").
 		Columns("c1,c2,SUM(c3) AS total,AVG(c4) AS average").
 		Where("c1=?", 1).
@@ -93,7 +92,7 @@ func ExampleSelect() {
 	fmt.Printf("Sample07: query:%s args:%v\n", query, args)
 	
 	// Sample08
-	query, args, err = sq.
+	query, args, err = querybuilder.Select().
 		Table("table1").
 		Columns("id,c1,c2,c3").
 		Joins("table2", "table1.id = table2.t_id", querybuilder.JoinLeft).
@@ -104,7 +103,7 @@ func ExampleSelect() {
 	fmt.Printf("Sample08: query:%s args:%v\n", query, args)
 	
 	// Sample09
-	query, args, err = sq.
+	query, args, err = querybuilder.Select().
 		Table("table1 t1").
 		Columns("t1.id,t2.c3").
 		Joins("table2 t2", "t1.id = t2.t_id", querybuilder.JoinInner).
@@ -115,7 +114,7 @@ func ExampleSelect() {
 	fmt.Printf("Sample09: query:%s args:%v\n", query, args)
 	
 	// Sample10
-	query, args, err = sq.
+	query, args, err = querybuilder.Select().
 		Table("table1").
 		Columns("c1,c2").
 		Order("c1", querybuilder.OrderDesc).
@@ -126,7 +125,7 @@ func ExampleSelect() {
 	fmt.Printf("Sample10: query:%s args:%v\n", query, args)
 	
 	// Sample11
-	query, args, err = sq.
+	query, args, err = querybuilder.Select().
 		Table("table1").
 		Columns("c1,c2").
 		Order("c1", querybuilder.OrderDesc).
@@ -138,7 +137,7 @@ func ExampleSelect() {
 	fmt.Printf("Sample11: query:%s args:%v\n", query, args)
 	
 	// Sample12
-	query, args, err = sq.
+	query, args, err = querybuilder.Select().
 		Table("table1").
 		Columns("c1,c2").
 		Limit(20).
@@ -175,10 +174,8 @@ func ExampleInsert() {
 	}
 	sampleImage := []byte("img")
 	
-	sq := querybuilder.Insert()
-	
 	// Sample01 with map[string]interface{} as input
-	query, args, err := sq.
+	query, args, err := querybuilder.Insert().
 		Table("table1").
 		MapValues(map[string]interface{}{"field1": "value1", "field2": 10}).
 		Build()
@@ -188,7 +185,7 @@ func ExampleInsert() {
 	fmt.Printf("Sample01: query:%s args:%v\n", query, args)
 	
 	// Sample02 with Structure as input
-	query, args, err = sq.
+	query, args, err = querybuilder.Insert().
 		Table("table1").
 		StructValues(sampleStructType{
 			Name:  "Omid",
@@ -205,7 +202,7 @@ func ExampleInsert() {
 	fmt.Printf("Sample02: query:%s args:%v\n", query, args)
 	
 	// Sample03 with Structure as input - skipping null value for pointers
-	query, args, err = sq.
+	query, args, err = querybuilder.Insert().
 		Table("table1").
 		StructValues(sampleStructType{
 			Name:  "Omid",
@@ -221,7 +218,7 @@ func ExampleInsert() {
 	fmt.Printf("Sample03: query:%s args:%v\n", query, args)
 	
 	// Sample04 nil column/value
-	_, _, err = sq.
+	_, _, err = querybuilder.Insert().
 		Table("table1").
 		Build()
 	if err != nil {
@@ -246,10 +243,8 @@ func ExampleUpdate() {
 	}
 	sampleImage := []byte("img")
 	
-	sq := querybuilder.Update()
-	
 	// Sample01 with map[string]interface{} as input
-	query, args, err := sq.
+	query, args, err := querybuilder.Update().
 		Table("table1").
 		MapValues(map[string]interface{}{"field1": "value1", "field2": 10}).
 		Build()
@@ -259,7 +254,7 @@ func ExampleUpdate() {
 	fmt.Printf("Sample01: query:%s args:%v\n", query, args)
 	
 	// Sample02 with Structure as input
-	query, args, err = sq.
+	query, args, err = querybuilder.Update().
 		Table("table1").
 		StructValues(sampleStructType{
 			Name:  "Omid",
@@ -276,7 +271,7 @@ func ExampleUpdate() {
 	fmt.Printf("Sample02: query:%s args:%v\n", query, args)
 	
 	// Sample03 with Structure as input - skipping null value for pointers
-	query, args, err = sq.
+	query, args, err = querybuilder.Update().
 		Table("table1").
 		StructValues(sampleStructType{
 			Name:  "Omid",
@@ -292,7 +287,7 @@ func ExampleUpdate() {
 	fmt.Printf("Sample03: query:%s args:%v\n", query, args)
 	
 	// Sample04 nil column/value
-	_, _, err = sq.
+	_, _, err = querybuilder.Update().
 		Table("table1").
 		Build()
 	if err != nil {
@@ -308,10 +303,9 @@ func ExampleUpdate() {
 }
 
 func ExampleDelete() {
-	sq := querybuilder.Delete()
 	
 	// Sample01
-	query, args, err := sq.
+	query, args, err := querybuilder.Delete().
 		Table("table1").
 		Where("id=?", 10).
 		Build()
@@ -321,7 +315,7 @@ func ExampleDelete() {
 	fmt.Printf("Sample01: query:%s args:%v\n", query, args)
 	
 	// Sample02
-	query, args, err = sq.
+	query, args, err = querybuilder.Delete().
 		Table("table1").
 		Where("id=?", 10).
 		Where("email=? OR name=?", "o.hojabri@gmail.com", "Omid").
@@ -332,7 +326,7 @@ func ExampleDelete() {
 	fmt.Printf("Sample02: query:%s args:%v\n", query, args)
 	
 	// Sample03- wrong number of arguments
-	_, _, err = sq.
+	_, _, err = querybuilder.Delete().
 		Table("table1").
 		Where("id=?", 10).
 		Where("email=? OR name=?", "o.hojabri@gmail.com").
