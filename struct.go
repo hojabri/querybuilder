@@ -23,14 +23,14 @@ func mapToIndexColumnValue(columnValues map[string]interface{}) IndexedColumnVal
 		i++
 	}
 	sort.Strings(columns)
-	
+
 	for i = 0; i < len(columns); i++ {
 		indexedColumnValues[i] = KeyValue{
 			Key:   columns[i],
 			Value: columnValues[columns[i]],
 		}
 	}
-	
+
 	return indexedColumnValues
 }
 
@@ -41,7 +41,7 @@ func structToMap(s interface{}) (IndexedColumnValues, error) {
 	if v.Kind() == reflect.Ptr {
 		v = reflect.Indirect(v)
 	}
-	
+
 	if v.Kind() != reflect.Struct {
 		return nil, errors.New("unexpected type")
 	}
@@ -50,7 +50,7 @@ func structToMap(s interface{}) (IndexedColumnValues, error) {
 	for i := 0; i < e.NumField(); i++ {
 		name := e.Field(i).Name
 		tag := strings.Split(e.Field(i).Tag.Get("db"), ",")[0] // use split to ignore tag "options"
-		
+
 		// ignore columns with -
 		if tag == "-" {
 			continue
@@ -60,7 +60,18 @@ func structToMap(s interface{}) (IndexedColumnValues, error) {
 		if tag == "" {
 			column = name
 		}
-		
+		if e.Field(i).Type.Kind() == reflect.Struct {
+			nestedColumnValues, err := structToMap(value.Interface())
+			if err != nil {
+				return nil, err
+			}
+			for index := 0; index < len(nestedColumnValues); index++ {
+				columnValues[columnIndex] = KeyValue{Key: nestedColumnValues[index].Key, Value: nestedColumnValues[index].Value}
+				columnIndex++
+			}
+			continue
+		}
+
 		// ignore nil pointer values
 		if value.IsZero() && value.Kind() == reflect.Ptr {
 			continue
@@ -73,7 +84,7 @@ func structToMap(s interface{}) (IndexedColumnValues, error) {
 		if value.Interface() == nil {
 			continue
 		}
-		
+
 		columnValues[columnIndex] = KeyValue{Key: column, Value: value.Interface()}
 		columnIndex++
 	}

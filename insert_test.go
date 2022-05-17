@@ -4,23 +4,27 @@ import (
 	"errors"
 	"testing"
 	"time"
-	
+
 	"github.com/stretchr/testify/require"
 )
 
 func TestInsertQuery_Build(t *testing.T) {
 	i := Insert()
-	type sampleStructType struct {
+	type NestedStructType struct {
+		Level string `json:"level,omitempty" db:"level"`
+	}
+	type SampleStructType struct {
 		Name  string      `json:"name,omitempty" db:"name"`
 		Email string      `json:"email,omitempty" db:"email"`
 		ID    interface{} `json:"id,omitempty"`
 		Order float32     `json:"order" db:"-"`
 		Image *[]byte     `json:"image" db:"image"`
 		Grade int         `json:"grade" db:"grade"`
+		NestedStructType
 	}
-	
+
 	sampleImage := []byte("sample image bytes")
-	
+
 	tests := []struct {
 		name      string
 		query     *InsertQuery
@@ -51,51 +55,52 @@ func TestInsertQuery_Build(t *testing.T) {
 		},
 		{
 			name: "test4 - non pointer struct",
-			query: i.Table("table1").StructValues(sampleStructType{
-				Name:  "Omid",
-				Email: "o.hojabri@gmail.com",
-				ID:    74639876,
-				Image: &sampleImage,
-				Grade: 2,
+			query: i.Table("table1").StructValues(SampleStructType{
+				Name:             "Omid",
+				Email:            "o.hojabri@gmail.com",
+				ID:               74639876,
+				Image:            &sampleImage,
+				Grade:            2,
+				NestedStructType: NestedStructType{Level: "123"},
 			}),
-			wantQuery: "INSERT INTO table1(name,email,ID,image,grade) VALUES(?,?,?,?,?)",
-			wantArgs:  []interface{}{"Omid", "o.hojabri@gmail.com", 74639876, sampleImage, 2},
+			wantQuery: "INSERT INTO table1(name,email,ID,image,grade,level) VALUES(?,?,?,?,?,?)",
+			wantArgs:  []interface{}{"Omid", "o.hojabri@gmail.com", 74639876, sampleImage, 2, "123"},
 			wantErr:   nil,
 		},
 		{
 			name: "test5 -with pointer struct",
-			query: i.Table("table1").StructValues(&sampleStructType{
+			query: i.Table("table1").StructValues(&SampleStructType{
 				Name:  "Omid",
 				Email: "o.hojabri@gmail.com",
 				ID:    74639876,
 				Image: &sampleImage,
 				Grade: 2,
 			}),
-			wantQuery: "INSERT INTO table1(name,email,ID,image,grade) VALUES(?,?,?,?,?)",
-			wantArgs:  []interface{}{"Omid", "o.hojabri@gmail.com", 74639876, sampleImage, 2},
+			wantQuery: "INSERT INTO table1(name,email,ID,image,grade,level) VALUES(?,?,?,?,?,?)",
+			wantArgs:  []interface{}{"Omid", "o.hojabri@gmail.com", 74639876, sampleImage, 2, ""},
 			wantErr:   nil,
 		},
 		{
 			name: "test6 - empty and non pointer field",
-			query: i.Table("table1").StructValues(sampleStructType{
+			query: i.Table("table1").StructValues(SampleStructType{
 				Name:  "Omid",
 				Email: "o.hojabri@gmail.com",
 				ID:    74639876,
 				Image: &sampleImage,
 			}),
-			wantQuery: "INSERT INTO table1(name,email,ID,image,grade) VALUES(?,?,?,?,?)",
-			wantArgs:  []interface{}{"Omid", "o.hojabri@gmail.com", 74639876, sampleImage, 0},
+			wantQuery: "INSERT INTO table1(name,email,ID,image,grade,level) VALUES(?,?,?,?,?,?)",
+			wantArgs:  []interface{}{"Omid", "o.hojabri@gmail.com", 74639876, sampleImage, 0, ""},
 			wantErr:   nil,
 		},
 		{
 			name: "test7 - empty and pointer field",
-			query: i.Table("table1").StructValues(sampleStructType{
+			query: i.Table("table1").StructValues(SampleStructType{
 				Name:  "Omid",
 				Email: "o.hojabri@gmail.com",
 				ID:    74639876,
 			}),
-			wantQuery: "INSERT INTO table1(name,email,ID,grade) VALUES(?,?,?,?)",
-			wantArgs:  []interface{}{"Omid", "o.hojabri@gmail.com", 74639876, 0},
+			wantQuery: "INSERT INTO table1(name,email,ID,grade,level) VALUES(?,?,?,?,?)",
+			wantArgs:  []interface{}{"Omid", "o.hojabri@gmail.com", 74639876, 0, ""},
 			wantErr:   nil,
 		},
 	}
