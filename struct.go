@@ -61,15 +61,18 @@ func structToMap(s interface{}) (IndexedColumnValues, error) {
 			column = name
 		}
 		if e.Field(i).Type.Kind() == reflect.Struct {
-			nestedColumnValues, err := structToMap(value.Interface())
-			if err != nil {
-				return nil, err
+			st := reflect.TypeOf(value.Interface())
+			if _, ok := st.MethodByName("String"); !ok {
+				nestedColumnValues, err := structToMap(value.Interface())
+				if err != nil {
+					return nil, err
+				}
+				for index := 0; index < len(nestedColumnValues); index++ {
+					columnValues[columnIndex] = KeyValue{Key: nestedColumnValues[index].Key, Value: nestedColumnValues[index].Value}
+					columnIndex++
+				}
+				continue
 			}
-			for index := 0; index < len(nestedColumnValues); index++ {
-				columnValues[columnIndex] = KeyValue{Key: nestedColumnValues[index].Key, Value: nestedColumnValues[index].Value}
-				columnIndex++
-			}
-			continue
 		}
 
 		// ignore nil pointer values
