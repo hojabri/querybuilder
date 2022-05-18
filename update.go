@@ -8,7 +8,6 @@ import (
 )
 
 type UpdateQuery struct {
-	driver              DriverName
 	table               string
 	indexedColumnValues IndexedColumnValues
 	conditions          []whereClause
@@ -85,9 +84,4 @@ func (s *UpdateQuery) Build() (string, []interface{}, error) {
 	}
 
 	return query, args, nil
-}
-
-// Rebind transforms a query table QUESTION to the DB driver's bindvar type.
-func (s *UpdateQuery) Rebind(query string) string {
-	return rebind(BindType(s.driver), query)
 }

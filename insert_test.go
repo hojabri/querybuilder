@@ -124,62 +124,74 @@ func TestInsertPanicNotStruct(t *testing.T) {
 func TestInsertQuery_Rebind(t *testing.T) {
 	tests := []struct {
 		name        string
+		driver      DriverName
 		insertQuery *InsertQuery
 		want        string
 	}{
 		{
 			name:        "test Postgres",
-			insertQuery: InsertByDriver("table1", DriverPostgres).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			driver:      DriverPostgres,
+			insertQuery: Insert("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES($1,$2)",
 		},
 		{
 			name:        "test PGX",
-			insertQuery: InsertByDriver("table1", DriverPGX).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			driver:      DriverPGX,
+			insertQuery: Insert("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES($1,$2)",
 		},
 		{
 			name:        "test pq-timeouts",
-			insertQuery: InsertByDriver("table1", DriverPqTimeout).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			driver:      DriverPqTimeout,
+			insertQuery: Insert("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES($1,$2)",
 		},
 		{
 			name:        "test CloudSqlPostgres",
-			insertQuery: InsertByDriver("table1", DriverCloudSqlPostgres).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			driver:      DriverCloudSqlPostgres,
+			insertQuery: Insert("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES($1,$2)",
 		},
 		{
 			name:        "test MySQL",
-			insertQuery: InsertByDriver("table1", DriverMySQL).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			driver:      DriverMySQL,
+			insertQuery: Insert("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(?,?)",
 		},
 		{
 			name:        "test Sqlite3",
-			insertQuery: InsertByDriver("table1", DriverSqlite3).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			driver:      DriverSqlite3,
+			insertQuery: Insert("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(?,?)",
 		},
 		{
 			name:        "test oci8",
-			insertQuery: InsertByDriver("table1", DriverOCI8).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			driver:      DriverOCI8,
+			insertQuery: Insert("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(:arg1,:arg2)",
 		},
 		{
 			name:        "test ora",
-			insertQuery: InsertByDriver("table1", DriverORA).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			driver:      DriverORA,
+			insertQuery: Insert("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(:arg1,:arg2)",
 		},
 		{
 			name:        "test goracle",
-			insertQuery: InsertByDriver("table1", DriverGORACLE).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			driver:      DriverGORACLE,
+			insertQuery: Insert("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(:arg1,:arg2)",
 		},
 		{
 			name:        "test SqlServer",
-			insertQuery: InsertByDriver("table1", DriverSqlServer).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			driver:      DriverSqlServer,
+			insertQuery: Insert("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(@p1,@p2)",
 		},
 		{
 			name:        "test unknown",
-			insertQuery: InsertByDriver("table1", "abcdefg").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			driver:      "abcdefg",
+			insertQuery: Insert("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(?,?)",
 		},
 	}
@@ -189,7 +201,8 @@ func TestInsertQuery_Rebind(t *testing.T) {
 			if err != nil {
 				t.Errorf("can't build the query: %s", err)
 			}
-			if got := tt.insertQuery.Rebind(query); got != tt.want {
+			Driver = tt.driver
+			if got := Rebind(query); got != tt.want {
 				require.Equal(t, tt.want, got, "Rebind() got = %v, want %v", got, tt.want)
 			}
 		})

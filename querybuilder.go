@@ -1,15 +1,10 @@
 package querybuilder
 
+var Driver DriverName
+
 // Select creates new SelectQuery
 func Select(name string) *SelectQuery {
 	sq := SelectQuery{}
-	sq.table = name
-	return &sq
-}
-
-// SelectByDriver creates new SelectQuery by specifying driver name
-func SelectByDriver(name string, driver DriverName) *SelectQuery {
-	sq := SelectQuery{driver: driver}
 	sq.table = name
 	return &sq
 }
@@ -21,23 +16,9 @@ func Insert(name string) *InsertQuery {
 	return &iq
 }
 
-// InsertByDriver creates new InsertQuery by specifying driver name
-func InsertByDriver(name string, driver DriverName) *InsertQuery {
-	iq := InsertQuery{driver: driver}
-	iq.table = name
-	return &iq
-}
-
 // Update creates new UpdateQuery
 func Update(name string) *UpdateQuery {
 	uq := UpdateQuery{}
-	uq.table = name
-	return &uq
-}
-
-// UpdateByDriver creates new UpdateQuery by specifying driver name
-func UpdateByDriver(name string, driver DriverName) *UpdateQuery {
-	uq := UpdateQuery{driver: driver}
 	uq.table = name
 	return &uq
 }
@@ -49,9 +30,7 @@ func Delete(name string) *DeleteQuery {
 	return &dq
 }
 
-// DeleteByDriver creates new DeleteQuery by specifying driver name
-func DeleteByDriver(name string, driver DriverName) *DeleteQuery {
-	dq := DeleteQuery{driver: driver}
-	dq.table = name
-	return &dq
+// Rebind transforms a query table QUESTION to the DB driver's bindvar type.
+func Rebind(query string) string {
+	return rebind(BindType(Driver), query)
 }

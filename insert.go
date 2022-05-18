@@ -7,7 +7,6 @@ import (
 )
 
 type InsertQuery struct {
-	driver              DriverName
 	table               string
 	indexedColumnValues IndexedColumnValues
 }
@@ -56,9 +55,4 @@ func (s *InsertQuery) Build() (string, []interface{}, error) {
 	query = "INSERT INTO " + s.table + "(" + strings.Join(columns, ",") + ") VALUES(" + strings.TrimSuffix(strings.Repeat("?,", len(columns)), ",") + ")"
 
 	return query, args, nil
-}
-
-// Rebind transforms a query table QUESTION to the DB driver's bindvar type.
-func (s *InsertQuery) Rebind(query string) string {
-	return rebind(BindType(s.driver), query)
 }

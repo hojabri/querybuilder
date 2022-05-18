@@ -91,62 +91,74 @@ func TestUpdatePanicNotStruct(t *testing.T) {
 func TestUpdateQuery_Rebind(t *testing.T) {
 	tests := []struct {
 		name        string
+		driver      DriverName
 		updateQuery *UpdateQuery
 		want        string
 	}{
 		{
 			name:        "test Postgres",
-			updateQuery: UpdateByDriver("table1", DriverPostgres).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			driver:      DriverPostgres,
+			updateQuery: Update("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=$1,field2=$2 WHERE (id=$3)",
 		},
 		{
 			name:        "test PGX",
-			updateQuery: UpdateByDriver("table1", DriverPGX).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			driver:      DriverPGX,
+			updateQuery: Update("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=$1,field2=$2 WHERE (id=$3)",
 		},
 		{
 			name:        "test pq-timeouts",
-			updateQuery: UpdateByDriver("table1", DriverPqTimeout).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			driver:      DriverPqTimeout,
+			updateQuery: Update("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=$1,field2=$2 WHERE (id=$3)",
 		},
 		{
 			name:        "test CloudSqlPostgres",
-			updateQuery: UpdateByDriver("table1", DriverCloudSqlPostgres).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			driver:      DriverCloudSqlPostgres,
+			updateQuery: Update("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=$1,field2=$2 WHERE (id=$3)",
 		},
 		{
 			name:        "test MySQL",
-			updateQuery: UpdateByDriver("table1", DriverMySQL).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			driver:      DriverMySQL,
+			updateQuery: Update("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=?,field2=? WHERE (id=?)",
 		},
 		{
 			name:        "test Sqlite3",
-			updateQuery: UpdateByDriver("table1", DriverSqlite3).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			driver:      DriverSqlite3,
+			updateQuery: Update("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=?,field2=? WHERE (id=?)",
 		},
 		{
 			name:        "test oci8",
-			updateQuery: UpdateByDriver("table1", DriverOCI8).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			driver:      DriverOCI8,
+			updateQuery: Update("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=:arg1,field2=:arg2 WHERE (id=:arg3)",
 		},
 		{
 			name:        "test ora",
-			updateQuery: UpdateByDriver("table1", DriverORA).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			driver:      DriverORA,
+			updateQuery: Update("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=:arg1,field2=:arg2 WHERE (id=:arg3)",
 		},
 		{
 			name:        "test goracle",
-			updateQuery: UpdateByDriver("table1", DriverGORACLE).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			driver:      DriverGORACLE,
+			updateQuery: Update("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=:arg1,field2=:arg2 WHERE (id=:arg3)",
 		},
 		{
 			name:        "test SqlServer",
-			updateQuery: UpdateByDriver("table1", DriverSqlServer).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			driver:      DriverSqlServer,
+			updateQuery: Update("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=@p1,field2=@p2 WHERE (id=@p3)",
 		},
 		{
 			name:        "test unknown",
-			updateQuery: UpdateByDriver("table1", "abcdefg").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
+			driver:      "abcdefg",
+			updateQuery: Update("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}).Where("id=?", 5000),
 			want:        "UPDATE table1 SET field1=?,field2=? WHERE (id=?)",
 		},
 	}
@@ -156,7 +168,8 @@ func TestUpdateQuery_Rebind(t *testing.T) {
 			if err != nil {
 				t.Errorf("can't build the query: %s", err)
 			}
-			if got := tt.updateQuery.Rebind(query); got != tt.want {
+			Driver = tt.driver
+			if got := Rebind(query); got != tt.want {
 				require.Equal(t, tt.want, got, "Rebind() got = %v, want %v", got, tt.want)
 			}
 		})

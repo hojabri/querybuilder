@@ -44,7 +44,6 @@ func orderDirectionString(direction OrderDirection) string {
 }
 
 type SelectQuery struct {
-	driver     DriverName
 	columns    []columnClause
 	table      string
 	joins      []joinClause
@@ -230,9 +229,4 @@ func (s *SelectQuery) Build() (string, []interface{}, error) {
 	//
 	// return built tableName and args
 	return query, args, nil
-}
-
-// Rebind transforms a query table QUESTION to the DB driver's bindvar type.
-func (s *SelectQuery) Rebind(query string) string {
-	return rebind(BindType(s.driver), query)
 }

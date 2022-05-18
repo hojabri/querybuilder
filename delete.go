@@ -7,7 +7,6 @@ import (
 )
 
 type DeleteQuery struct {
-	driver     DriverName
 	table      string
 	conditions []whereClause
 }
@@ -51,9 +50,4 @@ func (s *DeleteQuery) Build() (string, []interface{}, error) {
 	}
 
 	return query, args, nil
-}
-
-// Rebind transforms a query table QUESTION to the DB driver's bindvar type.
-func (s *DeleteQuery) Rebind(query string) string {
-	return rebind(BindType(s.driver), query)
 }

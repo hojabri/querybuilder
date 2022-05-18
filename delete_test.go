@@ -53,62 +53,74 @@ func TestDeleteQuery_Build(t *testing.T) {
 func TestDeleteQuery_Rebind(t *testing.T) {
 	tests := []struct {
 		name        string
+		driver      DriverName
 		deleteQuery *DeleteQuery
 		want        string
 	}{
 		{
 			name:        "test Postgres",
-			deleteQuery: DeleteByDriver("table1", DriverPostgres).Where("id=?", 5000),
+			driver:      DriverPostgres,
+			deleteQuery: Delete("table1").Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=$1)",
 		},
 		{
 			name:        "test PGX",
-			deleteQuery: DeleteByDriver("table1", DriverPGX).Where("id=?", 5000),
+			driver:      DriverPGX,
+			deleteQuery: Delete("table1").Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=$1)",
 		},
 		{
 			name:        "test pq-timeouts",
-			deleteQuery: DeleteByDriver("table1", DriverPqTimeout).Where("id=?", 5000),
+			driver:      DriverPqTimeout,
+			deleteQuery: Delete("table1").Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=$1)",
 		},
 		{
 			name:        "test CloudSqlPostgres",
-			deleteQuery: DeleteByDriver("table1", DriverCloudSqlPostgres).Where("id=?", 5000),
+			driver:      DriverCloudSqlPostgres,
+			deleteQuery: Delete("table1").Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=$1)",
 		},
 		{
 			name:        "test MySQL",
-			deleteQuery: DeleteByDriver("table1", DriverMySQL).Where("id=?", 5000),
+			driver:      DriverMySQL,
+			deleteQuery: Delete("table1").Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=?)",
 		},
 		{
 			name:        "test Sqlite3",
-			deleteQuery: DeleteByDriver("table1", DriverSqlite3).Where("id=?", 5000),
+			driver:      DriverSqlite3,
+			deleteQuery: Delete("table1").Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=?)",
 		},
 		{
 			name:        "test oci8",
-			deleteQuery: DeleteByDriver("table1", DriverOCI8).Where("id=?", 5000),
+			driver:      DriverOCI8,
+			deleteQuery: Delete("table1").Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=:arg1)",
 		},
 		{
 			name:        "test ora",
-			deleteQuery: DeleteByDriver("table1", DriverORA).Where("id=?", 5000),
+			driver:      DriverORA,
+			deleteQuery: Delete("table1").Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=:arg1)",
 		},
 		{
 			name:        "test goracle",
-			deleteQuery: DeleteByDriver("table1", DriverGORACLE).Where("id=?", 5000),
+			driver:      DriverGORACLE,
+			deleteQuery: Delete("table1").Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=:arg1)",
 		},
 		{
 			name:        "test SqlServer",
-			deleteQuery: DeleteByDriver("table1", DriverSqlServer).Where("id=?", 5000),
+			driver:      DriverSqlServer,
+			deleteQuery: Delete("table1").Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=@p1)",
 		},
 		{
 			name:        "test unknown",
-			deleteQuery: DeleteByDriver("table1", "abcdefg").Where("id=?", 5000),
+			driver:      "abcdefg",
+			deleteQuery: Delete("table1").Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=?)",
 		},
 	}
@@ -118,7 +130,8 @@ func TestDeleteQuery_Rebind(t *testing.T) {
 			if err != nil {
 				t.Errorf("can't build the query: %s", err)
 			}
-			if got := tt.deleteQuery.Rebind(query); got != tt.want {
+			Driver = tt.driver
+			if got := Rebind(query); got != tt.want {
 				require.Equal(t, tt.want, got, "Rebind() got = %v, want %v", got, tt.want)
 			}
 		})
