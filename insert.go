@@ -12,12 +12,6 @@ type InsertQuery struct {
 	indexedColumnValues IndexedColumnValues
 }
 
-func (s *InsertQuery) Table(name string) *InsertQuery {
-	newQuery := *s
-	newQuery.table = name
-	return &newQuery
-}
-
 // MapValues gets columns and values,
 // Enter Column/Values as a key/value map
 func (s *InsertQuery) MapValues(columnValues map[string]interface{}) *InsertQuery {
@@ -45,22 +39,22 @@ func (s *InsertQuery) Build() (string, []interface{}, error) {
 		return "", nil, errors.New(ErrColumnValueMapIsEmpty)
 	}
 	var query string
-	
+
 	args := make([]interface{}, len(s.indexedColumnValues))
-	
+
 	// make column slice
 	columns := make([]string, len(s.indexedColumnValues))
-	
+
 	for i := 0; i < len(s.indexedColumnValues); i++ {
 		indexedColumnValue := s.indexedColumnValues[i]
 		columns[i] = indexedColumnValue.Key
 		args[i] = indexedColumnValue.Value
 	}
-	
+
 	//
 	// add table name
 	query = "INSERT INTO " + s.table + "(" + strings.Join(columns, ",") + ") VALUES(" + strings.TrimSuffix(strings.Repeat("?,", len(columns)), ",") + ")"
-	
+
 	return query, args, nil
 }
 

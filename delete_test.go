@@ -2,13 +2,13 @@ package querybuilder
 
 import (
 	"errors"
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestDeleteQuery_Build(t *testing.T) {
-	d := Delete()
 	tests := []struct {
 		name      string
 		query     *DeleteQuery
@@ -18,21 +18,21 @@ func TestDeleteQuery_Build(t *testing.T) {
 	}{
 		{
 			name:      "test1",
-			query:     d,
+			query:     Delete(""),
 			wantQuery: "",
 			wantArgs:  []interface{}(nil),
 			wantErr:   errors.New(ErrTableIsEmpty),
 		},
 		{
 			name:      "test2",
-			query:     d.Table("table1").Where("id=?", 5000),
+			query:     Delete("table1").Where("id=?", 5000),
 			wantQuery: "DELETE FROM table1 WHERE (id=?)",
 			wantArgs:  []interface{}{5000},
 			wantErr:   nil,
 		},
 		{
 			name:      "test3 - wrong number of arguments",
-			query:     d.Table("table1").Where("id=?", 5000, 10),
+			query:     Delete("table1").Where("id=?", 5000, 10),
 			wantQuery: "",
 			wantArgs:  []interface{}(nil),
 			wantErr:   errors.New(ErrWrongNumberOfArgs),
@@ -58,57 +58,57 @@ func TestDeleteQuery_Rebind(t *testing.T) {
 	}{
 		{
 			name:        "test Postgres",
-			deleteQuery: DeleteByDriver(DriverPostgres).Table("table1").Where("id=?", 5000),
+			deleteQuery: DeleteByDriver("table1", DriverPostgres).Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=$1)",
 		},
 		{
 			name:        "test PGX",
-			deleteQuery: DeleteByDriver(DriverPGX).Table("table1").Where("id=?", 5000),
+			deleteQuery: DeleteByDriver("table1", DriverPGX).Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=$1)",
 		},
 		{
 			name:        "test pq-timeouts",
-			deleteQuery: DeleteByDriver(DriverPqTimeout).Table("table1").Where("id=?", 5000),
+			deleteQuery: DeleteByDriver("table1", DriverPqTimeout).Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=$1)",
 		},
 		{
 			name:        "test CloudSqlPostgres",
-			deleteQuery: DeleteByDriver(DriverCloudSqlPostgres).Table("table1").Where("id=?", 5000),
+			deleteQuery: DeleteByDriver("table1", DriverCloudSqlPostgres).Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=$1)",
 		},
 		{
 			name:        "test MySQL",
-			deleteQuery: DeleteByDriver(DriverMySQL).Table("table1").Where("id=?", 5000),
+			deleteQuery: DeleteByDriver("table1", DriverMySQL).Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=?)",
 		},
 		{
 			name:        "test Sqlite3",
-			deleteQuery: DeleteByDriver(DriverSqlite3).Table("table1").Where("id=?", 5000),
+			deleteQuery: DeleteByDriver("table1", DriverSqlite3).Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=?)",
 		},
 		{
 			name:        "test oci8",
-			deleteQuery: DeleteByDriver(DriverOCI8).Table("table1").Where("id=?", 5000),
+			deleteQuery: DeleteByDriver("table1", DriverOCI8).Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=:arg1)",
 		},
 		{
 			name:        "test ora",
-			deleteQuery: DeleteByDriver(DriverORA).Table("table1").Where("id=?", 5000),
+			deleteQuery: DeleteByDriver("table1", DriverORA).Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=:arg1)",
 		},
 		{
 			name:        "test goracle",
-			deleteQuery: DeleteByDriver(DriverGORACLE).Table("table1").Where("id=?", 5000),
+			deleteQuery: DeleteByDriver("table1", DriverGORACLE).Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=:arg1)",
 		},
 		{
 			name:        "test SqlServer",
-			deleteQuery: DeleteByDriver(DriverSqlServer).Table("table1").Where("id=?", 5000),
+			deleteQuery: DeleteByDriver("table1", DriverSqlServer).Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=@p1)",
 		},
 		{
 			name:        "test unknown",
-			deleteQuery: DeleteByDriver("abcdefg").Table("table1").Where("id=?", 5000),
+			deleteQuery: DeleteByDriver("table1", "abcdefg").Where("id=?", 5000),
 			want:        "DELETE FROM table1 WHERE (id=?)",
 		},
 	}

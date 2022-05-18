@@ -56,12 +56,6 @@ type SelectQuery struct {
 	offset     interface{}
 }
 
-func (s *SelectQuery) Table(name string) *SelectQuery {
-	newQuery := *s
-	newQuery.table = name
-	return &newQuery
-}
-
 func (s *SelectQuery) Columns(query string, args ...interface{}) *SelectQuery {
 	args, _ = unifyArgs(args...)
 	column := columnClause{
@@ -93,7 +87,7 @@ func (s *SelectQuery) Where(query string, args ...interface{}) *SelectQuery {
 		args:  args,
 	}
 	newQuery := *s
-	
+
 	newQuery.conditions = append(newQuery.conditions, condition)
 	return &newQuery
 }
@@ -105,7 +99,7 @@ func (s *SelectQuery) Having(query string, args ...interface{}) *SelectQuery {
 		args:  args,
 	}
 	newQuery := *s
-	
+
 	newQuery.havings = append(newQuery.havings, having)
 	return &newQuery
 }
@@ -228,7 +222,7 @@ func (s *SelectQuery) Build() (string, []interface{}, error) {
 			return "", nil, errors.New(ErrOffsetNotInteger)
 		}
 	}
-	
+
 	// compare the number of args and ? in tableName
 	if len(args) != strings.Count(query, "?") {
 		return "", nil, errors.New(ErrWrongNumberOfArgs)

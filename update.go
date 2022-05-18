@@ -14,12 +14,6 @@ type UpdateQuery struct {
 	conditions          []whereClause
 }
 
-func (s *UpdateQuery) Table(name string) *UpdateQuery {
-	newQuery := *s
-	newQuery.table = name
-	return &newQuery
-}
-
 func (s *UpdateQuery) Where(query string, args ...interface{}) *UpdateQuery {
 	args, _ = unifyArgs(args...)
 	condition := whereClause{
@@ -27,7 +21,7 @@ func (s *UpdateQuery) Where(query string, args ...interface{}) *UpdateQuery {
 		args:  args,
 	}
 	newQuery := *s
-	
+
 	newQuery.conditions = append(newQuery.conditions, condition)
 	return &newQuery
 }
@@ -60,20 +54,20 @@ func (s *UpdateQuery) Build() (string, []interface{}, error) {
 	}
 	var query string
 	args := make([]interface{}, len(s.indexedColumnValues))
-	
+
 	// make column slice
 	columns := make([]string, len(s.indexedColumnValues))
 	var setQuery []string
-	
+
 	for i := 0; i < len(s.indexedColumnValues); i++ {
 		indexedColumnValue := s.indexedColumnValues[i]
 		columns[i] = indexedColumnValue.Key
 		args[i] = indexedColumnValue.Value
 		setQuery = append(setQuery, columns[i]+"=?")
 	}
-	
+
 	query = "UPDATE " + s.table + " SET " + strings.Join(setQuery, ",")
-	
+
 	//
 	// check for where part
 	if len(s.conditions) > 0 {
@@ -84,12 +78,12 @@ func (s *UpdateQuery) Build() (string, []interface{}, error) {
 		}
 		query = query + " WHERE " + strings.Join(conditionsSlice, " AND ")
 	}
-	
+
 	// compare the number of args and ? in tableName
 	if len(args) != strings.Count(query, "?") {
 		return "", nil, errors.New(ErrWrongNumberOfArgs)
 	}
-	
+
 	return query, args, nil
 }
 

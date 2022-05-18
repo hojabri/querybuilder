@@ -12,12 +12,6 @@ type DeleteQuery struct {
 	conditions []whereClause
 }
 
-func (s *DeleteQuery) Table(name string) *DeleteQuery {
-	newQuery := *s
-	newQuery.table = name
-	return &newQuery
-}
-
 func (s *DeleteQuery) Where(query string, args ...interface{}) *DeleteQuery {
 	args, _ = unifyArgs(args...)
 	condition := whereClause{
@@ -25,7 +19,7 @@ func (s *DeleteQuery) Where(query string, args ...interface{}) *DeleteQuery {
 		args:  args,
 	}
 	newQuery := *s
-	
+
 	newQuery.conditions = append(newQuery.conditions, condition)
 	return &newQuery
 }
@@ -34,12 +28,12 @@ func (s *DeleteQuery) Build() (string, []interface{}, error) {
 	if s.table == "" {
 		return "", nil, errors.New(ErrTableIsEmpty)
 	}
-	
+
 	var query string
 	var args []interface{}
-	
+
 	query = "DELETE FROM " + s.table
-	
+
 	//
 	// check for where part
 	if len(s.conditions) > 0 {
@@ -50,12 +44,12 @@ func (s *DeleteQuery) Build() (string, []interface{}, error) {
 		}
 		query = query + " WHERE " + strings.Join(conditionsSlice, " AND ")
 	}
-	
+
 	// compare the number of args and ? in tableName
 	if len(args) != strings.Count(query, "?") {
 		return "", nil, errors.New(ErrWrongNumberOfArgs)
 	}
-	
+
 	return query, args, nil
 }
 

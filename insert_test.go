@@ -9,7 +9,6 @@ import (
 )
 
 func TestInsertQuery_Build(t *testing.T) {
-	i := Insert()
 	type NestedStructType struct {
 		Level string `json:"level,omitempty" db:"level"`
 	}
@@ -34,28 +33,28 @@ func TestInsertQuery_Build(t *testing.T) {
 	}{
 		{
 			name:      "test1",
-			query:     i.Table("table1").MapValues(nil),
+			query:     Insert("table1").MapValues(nil),
 			wantQuery: "",
 			wantArgs:  []interface{}(nil),
 			wantErr:   errors.New(ErrColumnValueMapIsEmpty),
 		},
 		{
 			name:      "test2",
-			query:     i,
+			query:     Insert(""),
 			wantQuery: "",
 			wantArgs:  []interface{}(nil),
 			wantErr:   errors.New(ErrTableIsEmpty),
 		},
 		{
 			name:      "test3",
-			query:     i.Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			query:     Insert("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			wantQuery: "INSERT INTO table1(field1,field2) VALUES(?,?)",
 			wantArgs:  []interface{}{10, "test"},
 			wantErr:   nil,
 		},
 		{
 			name: "test4 - non pointer struct",
-			query: i.Table("table1").StructValues(SampleStructType{
+			query: Insert("table1").StructValues(SampleStructType{
 				Name:             "Omid",
 				Email:            "o.hojabri@gmail.com",
 				ID:               74639876,
@@ -69,7 +68,7 @@ func TestInsertQuery_Build(t *testing.T) {
 		},
 		{
 			name: "test5 -with pointer struct",
-			query: i.Table("table1").StructValues(&SampleStructType{
+			query: Insert("table1").StructValues(&SampleStructType{
 				Name:  "Omid",
 				Email: "o.hojabri@gmail.com",
 				ID:    74639876,
@@ -82,7 +81,7 @@ func TestInsertQuery_Build(t *testing.T) {
 		},
 		{
 			name: "test6 - empty and non pointer field",
-			query: i.Table("table1").StructValues(SampleStructType{
+			query: Insert("table1").StructValues(SampleStructType{
 				Name:  "Omid",
 				Email: "o.hojabri@gmail.com",
 				ID:    74639876,
@@ -94,7 +93,7 @@ func TestInsertQuery_Build(t *testing.T) {
 		},
 		{
 			name: "test7 - empty and pointer field",
-			query: i.Table("table1").StructValues(SampleStructType{
+			query: Insert("table1").StructValues(SampleStructType{
 				Name:  "Omid",
 				Email: "o.hojabri@gmail.com",
 				ID:    74639876,
@@ -118,8 +117,7 @@ func TestInsertQuery_Build(t *testing.T) {
 
 func TestInsertPanicNotStruct(t *testing.T) {
 	require.Panics(t, func() {
-		i := Insert()
-		i.Table("table1").StructValues(123)
+		Insert("table1").StructValues(123)
 	}, "should panic with non struct types")
 }
 
@@ -131,57 +129,57 @@ func TestInsertQuery_Rebind(t *testing.T) {
 	}{
 		{
 			name:        "test Postgres",
-			insertQuery: InsertByDriver(DriverPostgres).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver("table1", DriverPostgres).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES($1,$2)",
 		},
 		{
 			name:        "test PGX",
-			insertQuery: InsertByDriver(DriverPGX).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver("table1", DriverPGX).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES($1,$2)",
 		},
 		{
 			name:        "test pq-timeouts",
-			insertQuery: InsertByDriver(DriverPqTimeout).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver("table1", DriverPqTimeout).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES($1,$2)",
 		},
 		{
 			name:        "test CloudSqlPostgres",
-			insertQuery: InsertByDriver(DriverCloudSqlPostgres).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver("table1", DriverCloudSqlPostgres).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES($1,$2)",
 		},
 		{
 			name:        "test MySQL",
-			insertQuery: InsertByDriver(DriverMySQL).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver("table1", DriverMySQL).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(?,?)",
 		},
 		{
 			name:        "test Sqlite3",
-			insertQuery: InsertByDriver(DriverSqlite3).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver("table1", DriverSqlite3).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(?,?)",
 		},
 		{
 			name:        "test oci8",
-			insertQuery: InsertByDriver(DriverOCI8).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver("table1", DriverOCI8).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(:arg1,:arg2)",
 		},
 		{
 			name:        "test ora",
-			insertQuery: InsertByDriver(DriverORA).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver("table1", DriverORA).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(:arg1,:arg2)",
 		},
 		{
 			name:        "test goracle",
-			insertQuery: InsertByDriver(DriverGORACLE).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver("table1", DriverGORACLE).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(:arg1,:arg2)",
 		},
 		{
 			name:        "test SqlServer",
-			insertQuery: InsertByDriver(DriverSqlServer).Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver("table1", DriverSqlServer).MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(@p1,@p2)",
 		},
 		{
 			name:        "test unknown",
-			insertQuery: InsertByDriver("abcdefg").Table("table1").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
+			insertQuery: InsertByDriver("table1", "abcdefg").MapValues(map[string]interface{}{"field1": 10, "field2": "test"}),
 			want:        "INSERT INTO table1(field1,field2) VALUES(?,?)",
 		},
 	}
