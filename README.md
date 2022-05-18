@@ -18,9 +18,7 @@ Import library
 below are examples to create these queries:
 
 ### SELECT
-To build SELECT queries, you need to first call `querybuilder.Select()` and then use a combination of below functions:
-
-- `Table(name string)` which gets the name of the table
+To build SELECT queries, you need to first call `querybuilder.Select(name string)` which `name` is table name and then use a combination of below functions:
 
 - `Columns(query string, args ...interface{})` gets the name of columns in the `query` parameter and optional arguments in the `args` parameter
 
@@ -43,14 +41,11 @@ direction can be one of `OrderAsc` or `OrderDesc`
 - `Limit(limit int64)` specifies LIMIT part of the SELECT query to have pagination. It accepts an `int64` value.
 - `Offset(offset int64)` specifies OFFSET part of the SELECT query to have pagination. It accepts an `int64` value.
 - `Build()` after specifying all SELECT functions, you need to call this method to create your final query string and also final arguments.
-- `Rebind(query string)` after your final query string is ready, you can call this method to rebind your query string based on the database driver.
 
 
 ### Sample 1
 ```go
-	query, args, err := querybuilder.Select().
-		Table("table1").
-		Build()
+	query, args, err := querybuilder.Select("table1").Build()
 
 ```
 
@@ -61,8 +56,7 @@ Output:
 
 ### Sample 2
 ```go
-	query, args, err = querybuilder.Select().
-		Table("table1").
+	query, args, err = querybuilder.Select("table1").
 		Columns("c1,c2,c3").
 		Build()
 ```
@@ -73,8 +67,7 @@ Output:
     args:   []
 ### Sample 3
 ```go
-	query, args, err = querybuilder.Select().
-		Table("table1").
+	query, args, err = querybuilder.Select("table1").
 		Columns("c1,c2,c3").
 		Where("c1=true").
 		Where("c2=?", 10).
@@ -88,8 +81,7 @@ Output:
 
 ### Sample 4
 ```go
-	query, args, err = querybuilder.Select().
-		Table("table1").
+	query, args, err = querybuilder.Select("table1").
 		Columns("c1,c2,c3").
 		Where("c1=true").
 		Where("c2=? OR c3>?", 10, 20).
@@ -101,8 +93,7 @@ Output:
     args:   [10 20]
 ### Sample 5
 ```go
-	query, args, err = querybuilder.Select().
-		Table("table1").
+	query, args, err = querybuilder.Select("table1").
 		Columns("c1,c2,c3").
 		Where("c1=?", true).
 		Where(querybuilder.In("c2", 10, 20)).
@@ -114,8 +105,7 @@ Output:
     args:   [true 10 20]
 ### Sample 6
 ```go
-	query, args, err = querybuilder.Select().
-		Table("table1").
+	query, args, err = querybuilder.Select("table1").
 		Columns("c1,c2,SUM(c3) AS total").
 		Where("c1=?", 1).
 		Group("c1,c2").
@@ -128,8 +118,7 @@ Output:
     args:   [1 100]
 ### Sample 7
 ```go
-	query, args, err = querybuilder.Select().
-		Table("table1").
+	query, args, err = querybuilder.Select("table1").
 		Columns("c1,c2,SUM(c3) AS total,AVG(c4) AS average").
 		Where("c1=?", 1).
 		Where("c2=?", true).
@@ -144,8 +133,7 @@ Output:
     args:   [1 true 100 0.1]
 ### Sample 8
 ```go
-	query, args, err = querybuilder.Select().
-		Table("table1").
+	query, args, err = querybuilder.Select("table1").
 		Columns("id,c1,c2,c3").
 		Joins("table2", "table1.id = table2.t_id", querybuilder.JoinLeft).
 		Build()
@@ -168,8 +156,7 @@ Output:
     args:   []
 ### Sample 10
 ```go
-	query, args, err = querybuilder.Select().
-		Table("table1").
+	query, args, err = querybuilder.Select("table1").
 		Columns("c1,c2").
 		Order("c1", querybuilder.OrderDesc).
 		Build()
@@ -180,8 +167,7 @@ Output:
     args:   []
 ### Sample 11
 ```go
-	query, args, err = querybuilder.Select().
-		Table("table1").
+	query, args, err = querybuilder.Select("table1").
 		Columns("c1,c2").
 		Order("c1", querybuilder.OrderDesc).
 		Order("c2", querybuilder.OrderAsc).
@@ -193,8 +179,7 @@ Output:
     args:   []
 ### Sample 12
 ```go
-	query, args, err = querybuilder.Select().
-		Table("table1").
+	query, args, err = querybuilder.Select("table1").
 		Columns("c1,c2").
 		Limit(20).
 		Offset(0).
@@ -206,8 +191,7 @@ Output:
     args:   []
 
 ### INSERT
-To build INSERT queries, you need to first call `querybuilder.Insert()` and then use a combination of below functions:
-- `Table(name string)` which gets the name of the table
+To build INSERT queries, you need to first call `querybuilder.Insert(name string)` which `name` is table name and then use a combination of below functions:
 - `MapValues(columnValues map[string]interface{})` you can specify columns and values to be inserted to table as a `map` object. (column name in string as the `key` of the map and the value in the `value` of the map)
 - `StructValues(structure interface{})` another and in some case better choice is to use any existing struct as an input for this function. It automatically extracts all columns and values from the `struct` type.
 the column name will the same as Struct field name, except you specify them in the struct `db` tags. For example:
@@ -224,7 +208,6 @@ the column name will the same as Struct field name, except you specify them in t
 _Note:_ if you want to skip a column to be used for insert query, you can use `"-"` for the `db` tag.
 
 - `Build()` after specifying all INSERT functions, you need to call this method to create your final query string and also final arguments.
-- `Rebind(query string)` after your final query string is ready, you can call this method to rebind your query string based on the database driver.
 
 
 Sample struct type for insert examples
@@ -241,8 +224,7 @@ Sample struct type for insert examples
 ```
 ### Sample 1
 ```go
-	query, args, err := querybuilder.Insert().
-		Table("table1").
+	query, args, err := querybuilder.Insert("table1").
 		MapValues(map[string]interface{}{"field1": "value1", "field2": 10}).
 		Build()
 ```
@@ -252,8 +234,7 @@ Output:
     args:   [value1 10]
 ### Sample 2
 ```go
-	query, args, err = querybuilder.Insert().
-		Table("table1").
+	query, args, err = querybuilder.Insert("table1").
 		StructValues(sampleStructType{
 			Name:  "Omid",
 			Email: "o.hojabri@gmail.com",
@@ -270,8 +251,7 @@ Output:
     args:   [Omid o.hojabri@gmail.com [105 109 103] 10]
 ### Sample 3
 ```go
-	query, args, err = querybuilder.Insert().
-		Table("table1").
+	query, args, err = querybuilder.Insert("table1").
 		StructValues(sampleStructType{
 			Name:  "Omid",
 			Email: "o.hojabri@gmail.com",
@@ -286,8 +266,7 @@ Output:
     query:  INSERT INTO table1(name,email,grade) VALUES(?,?,?)
     args:   [Omid o.hojabri@gmail.com 10]
 ### UPDATE
-To build UPDATE queries, you need to first call `querybuilder.UPDATE()` and then use a combination of below functions:
-- `Table(name string)` which gets the name of the table
+To build UPDATE queries, you need to first call `querybuilder.UPDATE(name string)` which `name` is table name and then use a combination of below functions:
 - `MapValues(columnValues map[string]interface{})` you can specify columns and values to be updated in the table as a `map` object. (column name in string as the `key` of the map and the value in the `value` of the map)
 - `StructValues(structure interface{})` another and in some case better choice is to use any existing struct as an input for this function. It automatically extracts all columns and values from the `struct` type.
   the column name will the same as Struct field name, except you specify them in the struct `db` tags. For example:
@@ -308,7 +287,6 @@ _Note:_ if you want to skip a column to be used for update query, you can use `"
 _Note:_ you can have many `Where` functions in any order
 
 - `Build()` after specifying all UPDATE functions, you need to call this method to create your final query string and also final arguments.
-- `Rebind(query string)` after your final query string is ready, you can call this method to rebind your query string based on the database driver.
 
 
 
@@ -326,8 +304,7 @@ Sample struct type for update examples
 ```
 ### Sample 1
 ```go
-	query, args, err := querybuilder.Update().
-		Table("table1").
+	query, args, err := querybuilder.Update("table1").
 		MapValues(map[string]interface{}{"field1": "value1", "field2": 10}).
 		Build()
 ```
@@ -337,8 +314,7 @@ Output:
     args:   [value1 10]
 ### Sample 2
 ```go
-	query, args, err = querybuilder.Update().
-		Table("table1").
+	query, args, err = querybuilder.Update("table1").
 		StructValues(sampleStructType{
 			Name:  "Omid",
 			Email: "o.hojabri@gmail.com",
@@ -355,8 +331,7 @@ Output:
     args:   [Omid o.hojabri@gmail.com [105 109 103] 10]
 ### Sample 3
 ```go
-	query, args, err = querybuilder.Update().
-		Table("table1").
+	query, args, err = querybuilder.Update("table1").
 		StructValues(sampleStructType{
 			Name:  "Omid",
 			Email: "o.hojabri@gmail.com",
@@ -371,17 +346,14 @@ Output:
     query:  UPDATE table1 SET name=?,email=?,grade=?
     args:   [Omid o.hojabri@gmail.com 10]
 ### DELETE
-To build DELETE queries, you need to first call `querybuilder.DELETE()` and then use a combination of below functions:
-- `Table(name string)` which gets the name of the table
+To build DELETE queries, you need to first call `querybuilder.DELETE(name string)` which `name` is table name and then use a combination of below functions:
 - `Where(query string, args ...interface{})` specifies the condition for the DELETE query. you can define the condition in the `query` parameter and it's arguments in the optional `args` parameter.
 - `Build()` after specifying all DELETE functions, you need to call this method to create your final query string and also final arguments.
-- `Rebind(query string)` after your final query string is ready, you can call this method to rebind your query string based on the database driver.
 
 _Note:_ you can have many `Where` functions in any order
 ### Sample 1
 ```go
-	query, args, err := querybuilder.Delete().
-		Table("table1").
+	query, args, err := querybuilder.Delete("table1").
 		Where("id=?", 10).
 		Build()
 ```
@@ -391,8 +363,7 @@ Output:
     args:   [10]
 ### Sample 2
 ```go
-	query, args, err = querybuilder.Delete().
-		Table("table1").
+	query, args, err = querybuilder.Delete("table1").
 		Where("id=?", 10).
 		Where("email=? OR name=?", "o.hojabri@gmail.com", "Omid").
 		Build()
@@ -403,27 +374,11 @@ Output:
     args:   [10 o.hojabri@gmail.com Omid]
 
 ### Specifying database driver
-If you want to use the `Rebind(query string)` function to rebinding the argument place-holders in your query, you need first specify the database driver.
+If you want to use the `querybuilder.Rebind(query string)` function to rebinding the argument place-holders in your query, you need first specify the database driver.
 
-So instead of using:
-
-`querybuilder.Select()`
-
-`querybuilder.Insert()`
-
-`querybuilder.Update()`
-
-`querybuilder.Delete()`
-
-you need to use:
-
-`SelectByDriver(driver DriverName)`
-
-`InsertByDriver(driver DriverName)`
-
-`UpdateByDriver(driver DriverName)`
-
-`DeleteByDriver(driver DriverName)`
+```go
+querybuilder.Driver = _driver_name_
+```
 
 driver name can be one of:
 ```go
@@ -441,9 +396,8 @@ DriverSqlServer        = "sqlserver"`
 
 For example:
 ```go
-	insertBuilder :=querybuilder.InsertByDriver(querybuilder.DriverPostgres)
-	query, args, err = qb.
-		Table("table1").
+    querybuilder.Driver = querybuilder.DriverPostgres
+	query, args, err = querybuilder.Insert("table1").
 		StructValues(sampleStructType{
 			Name:  "Omid",
 			Email: "o.hojabri@gmail.com",
@@ -457,6 +411,8 @@ For example:
 		log.Printf("err: %s", err)
 	}
 	// query: INSERT INTO table1(name,email,grade) VALUES(?,?,?)
-	query = insertBuilder.Rebind(query)
+	query = querybuilder.Rebind(query)
 	// query: INSERT INTO table1(name,email,grade) VALUES($1,$2,$3)
 ```
+
+`querybuilder.Rebind(query string)` after your final query string is ready, you can call this method to rebind your query string based on the database driver.
