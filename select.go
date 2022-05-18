@@ -3,6 +3,7 @@ package querybuilder
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -122,15 +123,61 @@ func (s *SelectQuery) Order(column string, direction OrderDirection) *SelectQuer
 	return &newQuery
 }
 
-func (s *SelectQuery) Limit(limit int64) *SelectQuery {
+func (s *SelectQuery) Limit(limit interface{}) *SelectQuery {
+	var l int64
+	var err error
+
+	switch v := limit.(type) {
+	case int8:
+		l = int64(v)
+	case int16:
+		l = int64(v)
+	case int32:
+		l = int64(v)
+	case int64:
+		l = v
+	case int:
+		l = int64(v)
+	case string:
+		l, err = strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			l = 0
+		}
+	default:
+		l = 0
+	}
+
 	newQuery := *s
-	newQuery.limit = limit
+	newQuery.limit = l
 	return &newQuery
 }
 
-func (s *SelectQuery) Offset(offset int64) *SelectQuery {
+func (s *SelectQuery) Offset(offset interface{}) *SelectQuery {
+	var o int64
+	var err error
+
+	switch v := offset.(type) {
+	case int8:
+		o = int64(v)
+	case int16:
+		o = int64(v)
+	case int32:
+		o = int64(v)
+	case int64:
+		o = v
+	case int:
+		o = int64(v)
+	case string:
+		o, err = strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			o = 0
+		}
+	default:
+		o = 0
+	}
+
 	newQuery := *s
-	newQuery.offset = offset
+	newQuery.offset = o
 	return &newQuery
 }
 
