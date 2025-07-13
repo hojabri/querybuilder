@@ -13,7 +13,7 @@ func unifyArgs(args ...interface{}) ([]interface{}, int) {
 		s := reflect.ValueOf(arg)
 		switch reflect.TypeOf(arg).Kind() {
 		case reflect.Slice:
-			count = +s.Len()
+			count += s.Len()
 			for i := 0; i < s.Len(); i++ {
 				newArgs = append(newArgs, s.Index(i).Interface())
 			}
@@ -27,7 +27,7 @@ func unifyArgs(args ...interface{}) ([]interface{}, int) {
 
 func In(column string, args ...interface{}) (string, []interface{}) {
 	args, count := unifyArgs(args...)
-	
+
 	if count == 0 {
 		return "", nil
 	}
