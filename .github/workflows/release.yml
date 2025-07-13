@@ -39,27 +39,23 @@ jobs:
         
         # Generate changelog
         if [ -z "$PREV_TAG" ]; then
-          echo "## Changes" > CHANGELOG.md
-          echo "" >> CHANGELOG.md
-          git log --pretty=format:"- %s (%h)" >> CHANGELOG.md
+          CHANGELOG="## Changes\n\n$(git log --pretty=format:'- %s (%h)')"
         else
-          echo "## Changes" > CHANGELOG.md
-          echo "" >> CHANGELOG.md
-          git log --pretty=format:"- %s (%h)" $PREV_TAG..HEAD >> CHANGELOG.md
+          CHANGELOG="## Changes\n\n$(git log --pretty=format:'- %s (%h)' $PREV_TAG..HEAD)"
         fi
         
-        # Set changelog as output
-        echo "changelog<<EOF" >> $GITHUB_OUTPUT
-        cat CHANGELOG.md >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
+        # Set changelog as output (using delimiter method)
+        {
+          echo 'changelog<<CHANGELOG_DELIMITER'
+          echo -e "$CHANGELOG"
+          echo 'CHANGELOG_DELIMITER'
+        } >> $GITHUB_OUTPUT
 
     - name: Create Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ steps.changelog.outputs.tag_name }}
-        release_name: Release ${{ steps.changelog.outputs.tag_name }}
+        name: Release ${{ steps.changelog.outputs.tag_name }}
         body: ${{ steps.changelog.outputs.changelog }}
         draft: false
         prerelease: false
